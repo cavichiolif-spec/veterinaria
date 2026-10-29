@@ -1,0 +1,642 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VetPr&aacute;tica – Portal do Médico Veterinário</title>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --t1:#2d5a1b;--t2:#4a7a2d;--tc:#6b9e40;--ts:#e8f2dc;
+      --g1:#1a2e0d;--g2:#2d5a1b;--gs:#e8f2dc;
+      --a1:#8b6914;--a2:#a0845c;--as:#faf3e7;
+      --azul:#1565c0;--azuls:#e3f2fd;
+      --sidebar:#1a2e0d;--sbw:240px;
+      --bg:#f5f0e8;--tx:#2c2c2c;--txs:#5a5a5a;--wh:#fff;
+      --sh:0 2px 8px rgba(0,0,0,.07);--shm:0 4px 18px rgba(0,0,0,.11);
+      --r:10px;--tr:.2s ease;
+      --bege:#faf3e7;--bege2:#f0e8d5;--bege3:#c8b89a
+    }
+    body{font-family:'Segoe UI',system-ui,sans-serif;color:var(--tx);background:var(--bg);min-height:100vh}
+    ::-webkit-scrollbar{width:6px}
+    ::-webkit-scrollbar-track{background:var(--bege)}
+    ::-webkit-scrollbar-thumb{background:var(--tc);border-radius:3px}
+    a{text-decoration:none;color:inherit}
+    .layout{display:flex;min-height:100vh}
+
+    /* ── SIDEBAR ── */
+    .sidebar{width:var(--sbw);background:var(--sidebar);color:#bbb;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;overflow-y:auto}
+    .sb-logo{padding:20px 18px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.07)}
+    .sb-li{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,var(--tc),var(--t1));display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+    .sb-nm{font-size:1rem;font-weight:800;color:white}
+    .sb-sub{font-size:.64rem;color:#888;font-weight:400}
+    .sb-nav{flex:1;padding:14px 0}
+    .sb-sec{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#555;padding:12px 18px 5px}
+    .ni{display:flex;align-items:center;gap:11px;padding:10px 18px;cursor:pointer;font-size:.87rem;color:#aaa;transition:background var(--tr),color var(--tr)}
+    .ni:hover{background:rgba(255,255,255,.05);color:white}
+    .ni.active{background:rgba(107,158,64,.18);color:white;border-right:3px solid var(--tc)}
+    .ni .ic{font-size:.95rem;width:18px;text-align:center;flex-shrink:0}
+    .nbadge{margin-left:auto;background:var(--a2);color:white;font-size:.66rem;font-weight:700;padding:2px 7px;border-radius:50px}
+    .sb-user{padding:14px 18px;border-top:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:11px}
+    .av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--t2),var(--g2));color:white;font-weight:700;font-size:.88rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .ui strong{display:block;font-size:.83rem;color:white}
+    .ui span{font-size:.72rem;color:#888}
+
+    /* ── MAIN ── */
+    .main{margin-left:var(--sbw);flex:1;display:flex;flex-direction:column}
+    .topbar{background:white;padding:13px 26px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 0 #e8e8e8;position:sticky;top:0;z-index:50}
+    .tb-l .tbt{font-size:1rem;font-weight:700}
+    .tb-l .tbs{font-size:.78rem;color:var(--txs)}
+    .tb-r{display:flex;align-items:center;gap:12px}
+    .tbtn{background:none;border:1.5px solid #ddd;border-radius:8px;padding:7px 13px;font-size:.82rem;cursor:pointer;display:flex;align-items:center;gap:6px;transition:border-color var(--tr),color var(--tr);font-family:inherit}
+    .tbtn:hover{border-color:var(--t2);color:var(--t1)}
+    .tbtn.pri{background:var(--t1);color:white;border-color:var(--t1)}
+    .tbtn.pri:hover{background:var(--t2);border-color:var(--t2)}
+    .bell{position:relative;cursor:pointer;font-size:1.1rem}
+    .bdot{position:absolute;top:-2px;right:-2px;width:8px;height:8px;background:#e53935;border-radius:50%;border:2px solid white}
+    .content{padding:24px;flex:1}
+
+    /* ── PANELS ── */
+    .panel{display:none}
+    .panel.active{display:block}
+
+    /* ── CARDS ── */
+    .sc-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;margin-bottom:24px}
+    .sc{background:white;border-radius:var(--r);padding:18px;box-shadow:var(--sh);display:flex;align-items:center;gap:12px}
+    .sc-ic{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+    .sc-num{font-size:1.6rem;font-weight:800;line-height:1}
+    .sc-lbl{font-size:.74rem;color:var(--txs);margin-top:2px}
+
+    /* ── CARDS WRAPPER ── */
+    .card{background:white;border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;margin-bottom:20px;border:1px solid var(--bege2)}
+    .ch{padding:16px 20px;border-bottom:1px solid var(--bege2);display:flex;align-items:center;justify-content:space-between;background:var(--bege)}
+    .ch h3{font-size:.93rem;font-weight:700}
+    .cb{padding:0}
+    .cbp{padding:20px}
+
+    /* ── TABLE ── */
+    table{width:100%;border-collapse:collapse}
+    th{font-size:.74rem;text-transform:uppercase;letter-spacing:.8px;color:var(--txs);font-weight:700;padding:9px 14px;background:#fafafa;text-align:left;border-bottom:1px solid #f0f0f0}
+    td{padding:11px 14px;font-size:.86rem;border-bottom:1px solid #f9f9f9;vertical-align:middle}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:#fafafa}
+    .bdg{display:inline-block;padding:3px 9px;border-radius:50px;font-size:.7rem;font-weight:700}
+    .ok{background:var(--gs);color:var(--g2)}
+    .al{background:#fff3e0;color:#e65100}
+    .urg{background:#fce4ec;color:#c62828}
+    .inf{background:var(--azuls);color:var(--azul)}
+    .teal{background:var(--ts);color:var(--t1)}
+
+    /* ── SEARCH ── */
+    .srch{display:flex;gap:10px;align-items:center;margin-bottom:18px;flex-wrap:wrap}
+    .si2{flex:1 1 200px;padding:9px 13px;border:1.5px solid #e0e0e0;border-radius:8px;font-size:.88rem;font-family:inherit}
+    .si2:focus{outline:none;border-color:var(--tc)}
+    .sel2{padding:9px 12px;border:1.5px solid #e0e0e0;border-radius:8px;font-size:.88rem;font-family:inherit;background:white}
+    .bsm{padding:9px 16px;border-radius:8px;font-size:.83rem;font-weight:600;cursor:pointer;border:none;transition:background var(--tr);font-family:inherit}
+    .bsm.teal{background:var(--t1);color:white}
+    .bsm.teal:hover{background:var(--g2)}
+    .bsm.out{background:none;border:1.5px solid #ddd;color:var(--txs)}
+    .bsm.out:hover{border-color:var(--tc);color:var(--t1)}
+
+    /* ── FORM ── */
+    .fg{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
+    .fgr{display:flex;flex-direction:column;gap:5px}
+    .fgr.full{grid-column:1/-1}
+    .fgr label{font-size:.79rem;font-weight:600;color:var(--txs)}
+    .fgr input,.fgr select,.fgr textarea{padding:9px 12px;border:1.5px solid var(--bege2);border-radius:8px;font-size:.88rem;font-family:inherit;transition:border-color var(--tr);background:var(--bege)}
+    .fgr input:focus,.fgr select:focus,.fgr textarea:focus{outline:none;border-color:var(--g2);box-shadow:0 0 0 3px rgba(74,122,45,.08);background:var(--wh)}
+    .fgr textarea{resize:vertical}
+    .fax{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+    .bsv{background:var(--t1);color:white;border:none;padding:10px 26px;border-radius:8px;font-size:.88rem;font-weight:700;cursor:pointer;transition:background var(--tr);font-family:inherit}
+    .bsv:hover{background:var(--g2)}
+    .bcn{background:none;border:1.5px solid #ddd;color:var(--txs);padding:9px 22px;border-radius:8px;font-size:.88rem;cursor:pointer;font-family:inherit}
+    .bcn:hover{border-color:#999;color:var(--tx)}
+
+    /* ── CALC ── */
+    .calc-w{background:white;border-radius:var(--r);padding:26px;max-width:680px;box-shadow:var(--sh)}
+    .calc-w h3{font-size:.98rem;font-weight:800;color:var(--t1);margin-bottom:20px}
+    .cgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .cgg{display:flex;flex-direction:column;gap:5px}
+    .cgg label{font-size:.78rem;font-weight:600;color:var(--txs)}
+    .cgg input,.cgg select{padding:9px 12px;border:1.5px solid #e0e0e0;border-radius:8px;font-size:.88rem;font-family:inherit}
+    .cgg input:focus,.cgg select:focus{outline:none;border-color:var(--tc)}
+    .bcalc{width:100%;background:var(--t1);color:white;border:none;padding:11px;border-radius:50px;font-size:.92rem;font-weight:700;cursor:pointer;margin-top:8px;font-family:inherit;transition:background var(--tr)}
+    .bcalc:hover{background:var(--g2)}
+    .cresb{background:var(--ts);border-radius:10px;padding:18px;text-align:center;margin-top:14px;display:none}
+    .cresb.on{display:block}
+    .crvm{font-size:2.2rem;font-weight:800;color:var(--t1)}
+    .crlm{font-size:.82rem;color:var(--txs);margin-top:4px}
+    .crdm{font-size:.76rem;color:var(--txs);margin-top:8px}
+
+    /* ── UNIT CONVERTER ── */
+    .conv-w{background:white;border-radius:var(--r);padding:26px;max-width:500px;box-shadow:var(--sh);margin-top:20px}
+    .conv-w h3{font-size:.98rem;font-weight:800;color:var(--t1);margin-bottom:18px}
+    .conv-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+    .conv-row input{flex:1;padding:9px 12px;border:1.5px solid #e0e0e0;border-radius:8px;font-size:.88rem;font-family:inherit}
+    .conv-row select{padding:9px 12px;border:1.5px solid #e0e0e0;border-radius:8px;font-family:inherit;font-size:.88rem}
+    .conv-arrow{font-size:1.2rem;color:var(--txs)}
+    .conv-result{background:var(--ts);padding:12px 16px;border-radius:8px;font-size:.95rem;font-weight:700;color:var(--t1);text-align:center;margin-top:10px;display:none}
+    .conv-result.on{display:block}
+
+    /* ── AGENDA ── */
+    .week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:20px}
+    .wday{text-align:center}
+    .wdn{font-size:.68rem;text-transform:uppercase;color:var(--txs);font-weight:600;margin-bottom:5px}
+    .wdnum{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;font-size:.88rem;font-weight:600;cursor:pointer;transition:background var(--tr)}
+    .wdnum:hover{background:var(--ts);color:var(--t1)}
+    .wdnum.today{background:var(--t1);color:white}
+    .wdnum.ev{position:relative}
+    .wdnum.ev::after{content:'';position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:var(--a2)}
+    .ev-list{display:flex;flex-direction:column;gap:10px}
+    .evi{background:white;border-radius:8px;padding:13px 16px;box-shadow:var(--sh);display:flex;align-items:center;gap:11px}
+    .evcolor{width:4px;height:38px;border-radius:4px;flex-shrink:0}
+    .evtime{font-size:.78rem;color:var(--txs);white-space:nowrap}
+    .evtitle{font-size:.88rem;font-weight:600}
+    .evsub{font-size:.75rem;color:var(--txs)}
+    .evbadge{margin-left:auto}
+    .btn-ev{background:var(--t1);color:white;border:none;padding:9px 18px;border-radius:8px;font-size:.82rem;font-weight:600;cursor:pointer;margin-top:14px;font-family:inherit}
+
+    /* ── REPORTS ── */
+    .rep-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:20px}
+    .rep-card{background:white;border-radius:var(--r);padding:20px;box-shadow:var(--sh);cursor:pointer;transition:transform var(--tr),box-shadow var(--tr);border:1.5px solid transparent}
+    .rep-card:hover{transform:translateY(-3px);box-shadow:var(--shm);border-color:var(--tc)}
+    .rep-ic{font-size:1.8rem;margin-bottom:8px}
+    .rep-card h4{font-size:.92rem;font-weight:700;margin-bottom:4px}
+    .rep-card p{font-size:.8rem;color:var(--txs)}
+
+    /* ── MODAL ── */
+    .movo{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;padding:16px}
+    .movo.on{opacity:1;pointer-events:all}
+    .modb{background:white;border-radius:14px;width:100%;max-width:580px;max-height:90vh;overflow-y:auto;padding:28px;box-shadow:0 16px 48px rgba(0,0,0,.25);transform:translateY(14px);transition:transform .25s}
+    .movo.on .modb{transform:translateY(0)}
+    .modb h3{font-size:1.05rem;font-weight:700;margin-bottom:18px;color:var(--t1)}
+    .modb-x{float:right;background:none;border:none;font-size:1.2rem;cursor:pointer;color:#aaa;margin-top:-4px}
+
+    /* ── 2-COL LAYOUT ── */
+    .two-col{display:grid;grid-template-columns:1.4fr 1fr;gap:20px}
+    @media(max-width:900px){.two-col{grid-template-columns:1fr}.sidebar{width:58px}.sb-nm,.sb-sub,.ni span:not(.ic),.nbadge,.ui{display:none}.main{margin-left:58px}.ni{justify-content:center;padding:12px}.cgrid{grid-template-columns:1fr}}
+    @media(max-width:600px){.sc-row{grid-template-columns:1fr 1fr}.tb-r .tbtn:not(.pri){display:none}}
+
+    /* ── HERD CARDS ── */
+    .herd-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+    .herd-card{background:white;border-radius:var(--r);padding:20px;box-shadow:var(--sh);border-left:4px solid var(--tc);transition:transform var(--tr)}
+    .herd-card:hover{transform:translateY(-3px)}
+    .herd-card h4{font-size:.93rem;font-weight:700;margin-bottom:4px}
+    .herd-card .hspec{font-size:.78rem;color:var(--txs);margin-bottom:10px}
+    .herd-card .hnum{font-size:1.4rem;font-weight:800;color:var(--t1)}
+    .herd-card .hnlbl{font-size:.72rem;color:var(--txs)}
+
+    /* TOAST */
+    .toast{position:fixed;bottom:20px;right:20px;background:var(--t1);color:white;padding:12px 20px;border-radius:10px;font-size:.88rem;font-weight:600;box-shadow:var(--shm);transform:translateX(200%);transition:transform .4s;z-index:9999}
+    .toast.on{transform:translateX(0)}
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <a href="index.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;padding:4px 0">
+        <img src="logo.PNG" alt="VetPratica" style="width:36px;height:36px;object-fit:contain;border-radius:6px;flex-shrink:0">
+        <div><div class="sb-nm">VetPr&aacute;tica</div><div class="sb-sub">Portal do MV</div></div>
+      </a>
+    </div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-sec">Principal</div>
+      <div class="ni active" onclick="show('dashboard',this)"><span class="ic">🝠</span><span>Dashboard</span></div>
+      <div class="ni" onclick="show('pacientes',this)"><span class="ic">🝾</span><span>Pacientes</span><span class="nbadge">127</span></div>
+      <div class="ni" onclick="show('rebanhos',this)"><span class="ic">🝄</span><span>Rebanhos</span></div>
+      <div class="ni" onclick="show('fichas',this)"><span class="ic">📋</span><span>Fichas Clínicas</span></div>
+      <div class="sb-sec">Ferramentas</div>
+      <div class="ni" onclick="show('calc',this)"><span class="ic">🧮</span><span>Calculadora</span></div>
+      <div class="ni" onclick="show('agenda',this)"><span class="ic">📅</span><span>Agenda</span><span class="nbadge">3</span></div>
+      <div class="ni" onclick="show('relatorios',this)"><span class="ic">📊</span><span>Relatórios</span></div>
+      <div class="sb-sec">Conta</div>
+      <div class="ni" onclick="show('config',this)"><span class="ic">⚙︝</span><span>Configurações</span></div>
+      <div class="ni" onclick="if(confirm('Sair da conta?'))window.location.href='index.html'"><span class="ic">🚪</span><span>Sair</span></div>
+    </nav>
+    <div class="sb-user">
+      <div class="av">AF</div>
+      <div class="ui"><strong>Dra. Ana Fernandes</strong><span>CRMV-SP 12345</span></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div class="tb-l"><div class="tbt" id="pagetitle">Dashboard</div><div class="tbs" id="pagesub">Bem-vinda, Dra. Ana! Você tem 8 consultas hoje.</div></div>
+      <div class="tb-r">
+        <div class="bell" title="Notificações">🔔<div class="bdot"></div></div>
+        <button class="tbtn out" onclick="window.print()">🖨︝ Imprimir</button>
+        <button class="tbtn pri" onclick="show('fichas');document.getElementById('new-ficha').style.display='block'">+ Nova Ficha</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ╝╝ DASHBOARD ╝╝ -->
+      <div class="panel active" id="p-dashboard">
+        <div class="sc-row">
+          <div class="sc"><div class="sc-ic" style="background:#e0f7fa">🝾</div><div><div class="sc-num" style="color:var(--t1)">127</div><div class="sc-lbl">Pacientes ativos</div></div></div>
+          <div class="sc"><div class="sc-ic" style="background:var(--gs)">📅</div><div><div class="sc-num" style="color:var(--g2)">8</div><div class="sc-lbl">Consultas hoje</div></div></div>
+          <div class="sc"><div class="sc-ic" style="background:var(--as)">🚗</div><div><div class="sc-num" style="color:var(--a2)">3</div><div class="sc-lbl">Visitas esta semana</div></div></div>
+          <div class="sc"><div class="sc-ic" style="background:var(--azuls)">🝄</div><div><div class="sc-num" style="color:var(--azul)">12</div><div class="sc-lbl">Rebanhos cadastrados</div></div></div>
+          <div class="sc"><div class="sc-ic" style="background:#f3e5f5">📋</div><div><div class="sc-num" style="color:#7b1fa2">342</div><div class="sc-lbl">Fichas clínicas</div></div></div>
+        </div>
+        <div class="two-col">
+          <div class="card">
+            <div class="ch"><h3>📅 Agenda de hoje – 20/10/2026</h3><button class="bsm out" onclick="show('agenda')">Ver agenda →</button></div>
+            <div class="cbp" style="display:flex;flex-direction:column;gap:10px">
+              <div class="evi"><div class="evcolor" style="background:#4caf50"></div><div><div class="evtime">08:30</div><div class="evtitle">Bovino #042 "Estrela" – Retorno pós-cirurgia</div><div class="evsub">Faz. Boa Vista</div></div><span class="bdg ok evbadge">Concluída</span></div>
+              <div class="evi"><div class="evcolor" style="background:#ff9800"></div><div><div class="evtime">10:00</div><div class="evtitle">Visita – Caprinocultura Serra Azul</div><div class="evsub">Vacinação lote 12 caprinos</div></div><span class="bdg al evbadge">Em andamento</span></div>
+              <div class="evi"><div class="evcolor" style="background:#2196f3"></div><div><div class="evtime">14:00</div><div class="evtitle">Equino #007 "Trovão" – Exame locomotor</div><div class="evsub">Haras São Lucas</div></div><span class="bdg inf evbadge">Agendada</span></div>
+              <div class="evi"><div class="evcolor" style="background:#e91e63"></div><div><div class="evtime">16:30</div><div class="evtitle">Urgência – Suíno · Granja Esperança</div><div class="evsub">Síndrome respiratória</div></div><span class="bdg urg evbadge">Urgente</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="ch"><h3>📋 Últimas Fichas</h3><button class="bsm out" onclick="show('fichas')">Ver todas →</button></div>
+            <div class="cb">
+              <table>
+                <tr><td><div style="font-size:.86rem;font-weight:600">Bovino #042 – Estrela</div><div style="font-size:.74rem;color:var(--txs)">Faz. Boa Vista</div></td><td><span class="bdg ok">Saudável</span></td></tr>
+                <tr><td><div style="font-size:.86rem;font-weight:600">Equino #007 – Trovão</div><div style="font-size:.74rem;color:var(--txs)">Haras São Lucas</div></td><td><span class="bdg al">Tratamento</span></td></tr>
+                <tr><td><div style="font-size:.86rem;font-weight:600">Caprino #115 – Mel</div><div style="font-size:.74rem;color:var(--txs)">Cap. Serra Azul</div></td><td><span class="bdg ok">Saudável</span></td></tr>
+                <tr><td><div style="font-size:.86rem;font-weight:600">Suíno #028</div><div style="font-size:.74rem;color:var(--txs)">Granja Esperança</div></td><td><span class="bdg urg">Crítico</span></td></tr>
+                <tr><td><div style="font-size:.86rem;font-weight:600">Ovino #089 – Pingo</div><div style="font-size:.74rem;color:var(--txs)">Faz. São Bento</div></td><td><span class="bdg inf">Pós-op</span></td></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ╝╝ PACIENTES ╝╝ -->
+      <div class="panel" id="p-pacientes">
+        <div class="srch">
+          <input class="si2" type="text" placeholder="🔝  Buscar por nome, número ou espécie..." oninput="filtrarTabela(this.value)">
+          <select class="sel2" id="filtroEsp"><option value="">Todas as espécies</option><option>Bovino</option><option>Equino</option><option>Ovino</option><option>Caprino</option><option>Suíno</option></select>
+          <button class="bsm teal" onclick="abrirModal('m-pac')">+ Novo Paciente</button>
+          <button class="bsm out">⬇ Exportar</button>
+        </div>
+        <div class="card">
+          <div class="ch"><h3>🝾 Lista de Pacientes</h3></div>
+          <div class="cb">
+            <table id="tabPac">
+              <thead><tr><th>Identificação</th><th>Espécie / Raça</th><th>Sexo</th><th>Propriedade</th><th>Peso (kg)</th><th>Última consulta</th><th>Status</th><th>Ações</th></tr></thead>
+              <tbody>
+                <tr><td><strong>#042</strong> – Estrela</td><td>Bovino · Nelore</td><td>Fêmea</td><td>Faz. Boa Vista</td><td>485</td><td>20/10/2026</td><td><span class="bdg ok">Saudável</span></td><td><button class="bsm out" onclick="abrirModal('m-ficha')">Ver ficha</button></td></tr>
+                <tr><td><strong>#007</strong> – Trovão</td><td>Equino · Quarto de Milha</td><td>Macho</td><td>Haras São Lucas</td><td>520</td><td>18/10/2026</td><td><span class="bdg al">Tratamento</span></td><td><button class="bsm out" onclick="abrirModal('m-ficha')">Ver ficha</button></td></tr>
+                <tr><td><strong>#115</strong> – Mel</td><td>Caprino · Boer</td><td>Fêmea</td><td>Cap. Serra Azul</td><td>42</td><td>15/10/2026</td><td><span class="bdg ok">Saudável</span></td><td><button class="bsm out" onclick="abrirModal('m-ficha')">Ver ficha</button></td></tr>
+                <tr><td><strong>#028</strong></td><td>Suíno · Landrace</td><td>Macho</td><td>Granja Esperança</td><td>110</td><td>20/10/2026</td><td><span class="bdg urg">Crítico</span></td><td><button class="bsm out" onclick="abrirModal('m-ficha')">Ver ficha</button></td></tr>
+                <tr><td><strong>#089</strong> – Pingo</td><td>Ovino · Santa Inês</td><td>Macho</td><td>Faz. São Bento</td><td>58</td><td>12/10/2026</td><td><span class="bdg inf">Pós-op</span></td><td><button class="bsm out" onclick="abrirModal('m-ficha')">Ver ficha</button></td></tr>
+                <tr><td><strong>#134</strong> – Joia</td><td>Bovino · Gir Leiteiro</td><td>Fêmea</td><td>Sítio das Palmas</td><td>410</td><td>10/10/2026</td><td><span class="bdg ok">Saudável</span></td><td><button class="bsm out" onclick="abrirModal('m-ficha')">Ver ficha</button></td></tr>
+                <tr><td><strong>#201</strong> – Relâmpago</td><td>Equino · Mangalarga</td><td>Macho</td><td>Haras São Lucas</td><td>490</td><td>08/10/2026</td><td><span class="bdg teal">Monitorado</span></td><td><button class="bsm out" onclick="abrirModal('m-ficha')">Ver ficha</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ╝╝ REBANHOS ╝╝ -->
+      <div class="panel" id="p-rebanhos">
+        <div class="srch">
+          <input class="si2" type="text" placeholder="🔝  Buscar rebanho ou propriedade...">
+          <select class="sel2"><option>Todas as espécies</option><option>Bovino</option><option>Equino</option><option>Ovino</option><option>Caprino</option><option>Suíno</option></select>
+          <button class="bsm teal" onclick="abrirModal('m-reb')">+ Novo Rebanho</button>
+        </div>
+        <div class="herd-grid">
+          <div class="herd-card"><h4>🝄 Rebanho Nelore</h4><div class="hspec">Bovino · Faz. Boa Vista</div><div class="hnum">48</div><div class="hnlbl">animais cadastrados</div></div>
+          <div class="herd-card" style="border-left-color:#ff9800"><h4>🝴 Plantel Haras São Lucas</h4><div class="hspec">Equino · Haras São Lucas</div><div class="hnum">12</div><div class="hnlbl">animais cadastrados</div></div>
+          <div class="herd-card" style="border-left-color:#9c27b0"><h4>🝝 Caprinos Serra Azul</h4><div class="hspec">Caprino · Cap. Serra Azul</div><div class="hnum">35</div><div class="hnlbl">animais cadastrados</div></div>
+          <div class="herd-card" style="border-left-color:#f44336"><h4>🝷 Granja Esperança</h4><div class="hspec">Suíno · Granja Esperança</div><div class="hnum">210</div><div class="hnlbl">animais cadastrados</div></div>
+          <div class="herd-card" style="border-left-color:#4caf50"><h4>🝑 Ovinos Faz. São Bento</h4><div class="hspec">Ovino · Faz. São Bento</div><div class="hnum">67</div><div class="hnlbl">animais cadastrados</div></div>
+          <div class="herd-card" style="border-left-color:#2196f3"><h4>🝄 Gir Leiteiro</h4><div class="hspec">Bovino · Sítio das Palmas</div><div class="hnum">22</div><div class="hnlbl">animais cadastrados</div></div>
+        </div>
+      </div>
+
+      <!-- ╝╝ FICHAS CLÝNICAS ╝╝ -->
+      <div class="panel" id="p-fichas">
+        <div class="srch">
+          <input class="si2" type="text" placeholder="🔝  Buscar por animal ou procedimento...">
+          <button class="bsm teal" onclick="document.getElementById('new-ficha').style.display=document.getElementById('new-ficha').style.display==='none'?'block':'none'">+ Nova Ficha</button>
+          <button class="bsm out">⬇ Exportar PDF</button>
+        </div>
+
+        <!-- Formulário nova ficha -->
+        <div id="new-ficha" class="card" style="display:none;margin-bottom:20px">
+          <div class="ch"><h3>📋 Nova Ficha Clínica</h3><button class="bsm out" onclick="document.getElementById('new-ficha').style.display='none'">Cancelar</button></div>
+          <div class="cbp">
+            <div class="fg">
+              <div class="fgr"><label>Nome / Identificação</label><input type="text" placeholder="Ex: Estrela ou #042"></div>
+              <div class="fgr"><label>Numeração do animal</label><input type="text" placeholder="Ex: #042"></div>
+              <div class="fgr"><label>Espécie</label><select><option>Bovino</option><option>Equino</option><option>Ovino</option><option>Caprino</option><option>Suíno</option></select></div>
+              <div class="fgr"><label>Raça</label><input type="text" placeholder="Ex: Nelore, Quarto de Milha..."></div>
+              <div class="fgr"><label>Sexo</label><select><option>Fêmea</option><option>Macho</option></select></div>
+              <div class="fgr"><label>Data de nascimento / Idade</label><input type="date"></div>
+              <div class="fgr"><label>Peso atual (kg)</label><input type="number" placeholder="Ex: 480"></div>
+              <div class="fgr"><label>Propriedade / Rebanho</label><select><option>Faz. Boa Vista</option><option>Haras São Lucas</option><option>Cap. Serra Azul</option><option>Granja Esperança</option><option>Faz. São Bento</option><option>Sítio das Palmas</option></select></div>
+              <div class="fgr"><label>Tipo de atendimento</label><select><option>Consulta geral</option><option>Retorno</option><option>Urgência</option><option>Visita de campo</option><option>Vacinação</option><option>Exame</option><option>Cirurgia</option></select></div>
+              <div class="fgr"><label>Data do atendimento</label><input type="date" value="2026-10-20"></div>
+              <div class="fgr full"><label>Anamnese / Queixa principal</label><textarea rows="3" placeholder="Descreva os sinais clínicos observados..."></textarea></div>
+              <div class="fgr full"><label>Exame físico</label><textarea rows="3" placeholder="Temperatura, frequência cardíaca, respiratória, mucosas, linfonodos..."></textarea></div>
+              <div class="fgr full"><label>Diagnóstico</label><textarea rows="2" placeholder="Diagnóstico presuntivo ou definitivo..."></textarea></div>
+              <div class="fgr full"><label>Tratamento prescrito</label><textarea rows="3" placeholder="Medicamentos, doses, vias e duração do tratamento..."></textarea></div>
+              <div class="fgr full"><label>Observações / Próximo retorno</label><textarea rows="2" placeholder="Recomendações e data de retorno..."></textarea></div>
+            </div>
+            <div class="fax">
+              <button class="bsv" onclick="salvarFicha()">💾 Salvar Ficha</button>
+              <button class="bcn" onclick="document.getElementById('new-ficha').style.display='none'">Cancelar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Histórico de fichas -->
+        <div class="card">
+          <div class="ch"><h3>📂 Histórico de Fichas Clínicas</h3></div>
+          <div class="cb">
+            <table>
+              <thead><tr><th>Data</th><th>Animal</th><th>Espécie</th><th>Tipo</th><th>Diagnóstico</th><th>MV Responsável</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td>20/10/2026</td><td>#042 – Estrela</td><td>Bovino</td><td>Retorno</td><td>Pós-cirurgia (rúmen)</td><td>Dra. Ana Fernandes</td><td><span class="bdg ok">Concluída</span></td></tr>
+                <tr><td>18/10/2026</td><td>#007 – Trovão</td><td>Equino</td><td>Exame</td><td>Claudicação grau II</td><td>Dra. Ana Fernandes</td><td><span class="bdg al">Em tratamento</span></td></tr>
+                <tr><td>15/10/2026</td><td>#115 – Mel</td><td>Caprino</td><td>Vacinação</td><td>Vacinação aftosa</td><td>Dr. Carlos Mendes</td><td><span class="bdg ok">Concluída</span></td></tr>
+                <tr><td>20/10/2026</td><td>#028</td><td>Suíno</td><td>Urgência</td><td>Sínd. respiratória</td><td>Dra. Ana Fernandes</td><td><span class="bdg urg">Em andamento</span></td></tr>
+                <tr><td>12/10/2026</td><td>#089 – Pingo</td><td>Ovino</td><td>Cirurgia</td><td>Prolapso retal</td><td>Dr. Carlos Mendes</td><td><span class="bdg inf">Pós-op</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ╝╝ CALCULADORA ╝╝ -->
+      <div class="panel" id="p-calc">
+        <div class="calc-w">
+          <h3>🧮 Calculadora de Doses</h3>
+          <div class="cgrid">
+            <div class="cgg"><label>Espécie</label><select id="dc-esp"><option>Bovino</option><option>Equino</option><option>Ovino</option><option>Caprino</option><option>Suíno</option></select></div>
+            <div class="cgg"><label>Peso do animal (kg)</label><input type="number" id="dc-peso" placeholder="Ex: 450" min="1" step="1"></div>
+            <div class="cgg"><label>Medicamento</label><select id="dc-med"><option value="">Selecione ou digite abaixo</option><option>Enrofloxacino</option><option>Oxitetraciclina LA</option><option>Florfenicol</option><option>Ivermectina</option><option>Penicilina G</option><option>Ampicilina</option><option>Meloxicam</option><option>Ketoprofeno</option><option>Dexametasona</option></select></div>
+            <div class="cgg"><label>Dose (mg/kg)</label><input type="number" id="dc-dose" placeholder="Ex: 2.5" min="0.01" step="0.01"></div>
+            <div class="cgg"><label>Concentração (mg/mL)</label><input type="number" id="dc-conc" placeholder="Ex: 50" min="0.01" step="0.01"></div>
+            <div class="cgg"><label>Via de administração</label><select id="dc-via"><option>Intramuscular (IM)</option><option>Subcutânea (SC)</option><option>Intravenosa (IV)</option><option>Oral (VO)</option></select></div>
+          </div>
+          <button class="bcalc" onclick="calcDash()">⚡ Calcular Dose</button>
+          <div class="cresb" id="dcres"><div class="crvm" id="dcrv">–</div><div class="crlm" id="dcrl">mL a administrar</div><div class="crdm" id="dcrd"></div></div>
+        </div>
+
+        <!-- Conversor de unidades -->
+        <div class="conv-w">
+          <h3>🔄 Conversor de Unidades</h3>
+          <div class="conv-row">
+            <input type="number" id="uv-in" placeholder="Valor" oninput="converter()">
+            <select id="uv-from" onchange="converter()">
+              <option value="mg">mg</option><option value="g">g</option><option value="kg">kg</option>
+              <option value="mL">mL</option><option value="L">L</option>
+              <option value="UI">UI (1000)</option>
+            </select>
+            <span class="conv-arrow">→</span>
+            <select id="uv-to" onchange="converter()">
+              <option value="g">g</option><option value="mg">mg</option><option value="kg">kg</option>
+              <option value="mL">mL</option><option value="L">L</option>
+              <option value="UI">UI (1000)</option>
+            </select>
+          </div>
+          <div class="conv-result" id="convres">–</div>
+        </div>
+      </div>
+
+      <!-- ╝╝ AGENDA ╝╝ -->
+      <div class="panel" id="p-agenda">
+        <div class="card" style="margin-bottom:20px">
+          <div class="ch"><h3>📅 Outubro 2026</h3><button class="bsm teal" onclick="abrirModal('m-ev')">+ Novo Evento</button></div>
+          <div class="cbp">
+            <div class="week-grid">
+              <div class="wday"><div class="wdn">Dom</div><div class="wdnum">18</div></div>
+              <div class="wday"><div class="wdn">Seg</div><div class="wdnum ev">19</div></div>
+              <div class="wday"><div class="wdn">Ter</div><div class="wdnum today ev">20</div></div>
+              <div class="wday"><div class="wdn">Qua</div><div class="wdnum ev">21</div></div>
+              <div class="wday"><div class="wdn">Qui</div><div class="wdnum">22</div></div>
+              <div class="wday"><div class="wdn">Sex</div><div class="wdnum ev">23</div></div>
+              <div class="wday"><div class="wdn">Sáb</div><div class="wdnum">24</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ch"><h3>📋 Eventos – Semana 20 a 26/10/2026</h3></div>
+          <div class="cbp">
+            <div class="ev-list">
+              <div class="evi"><div class="evcolor" style="background:#4caf50"></div><div><div class="evtime">Ter 20/10 · 08:30</div><div class="evtitle">Bovino #042 – Retorno pós-cirurgia</div><div class="evsub">Faz. Boa Vista · Consulta</div></div><span class="bdg ok evbadge">Concluída</span></div>
+              <div class="evi"><div class="evcolor" style="background:#ff9800"></div><div><div class="evtime">Ter 20/10 · 10:00</div><div class="evtitle">Visita – Cap. Serra Azul</div><div class="evsub">Vacinação 12 caprinos · Visita de campo</div></div><span class="bdg al evbadge">Em andamento</span></div>
+              <div class="evi"><div class="evcolor" style="background:#2196f3"></div><div><div class="evtime">Ter 20/10 · 14:00</div><div class="evtitle">Equino #007 – Exame locomotor + Raio-X</div><div class="evsub">Haras São Lucas · Exame</div></div><span class="bdg inf evbadge">Agendada</span></div>
+              <div class="evi"><div class="evcolor" style="background:#e91e63"></div><div><div class="evtime">Ter 20/10 · 16:30</div><div class="evtitle">Urgência – Suíno · Granja Esperança</div><div class="evsub">Síndrome respiratória</div></div><span class="bdg urg evbadge">Urgente</span></div>
+              <div class="evi"><div class="evcolor" style="background:#9c27b0"></div><div><div class="evtime">Qua 21/10 · 09:00</div><div class="evtitle">Bovino – Vacinação aftosa · Faz. Boa Vista</div><div class="evsub">Lote A – 48 animais · Visita de campo</div></div><span class="bdg teal evbadge">Programada</span></div>
+              <div class="evi"><div class="evcolor" style="background:#00897b"></div><div><div class="evtime">Sex 23/10 · 14:00</div><div class="evtitle">Equino #201 – Controle pós-tratamento</div><div class="evsub">Haras São Lucas · Retorno</div></div><span class="bdg inf evbadge">Agendada</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ╝╝ RELATÓRIOS ╝╝ -->
+      <div class="panel" id="p-relatorios">
+        <div class="rep-grid">
+          <div class="rep-card" onclick="gerarRelatorio('Atendimentos por período')"><div class="rep-ic">📊</div><h4>Atendimentos por período</h4><p>Relatório completo com todos os atendimentos em um intervalo de datas.</p></div>
+          <div class="rep-card" onclick="gerarRelatorio('Fichas por propriedade')"><div class="rep-ic">🝡</div><h4>Fichas por propriedade</h4><p>Histórico de todos os animais agrupados por propriedade rural.</p></div>
+          <div class="rep-card" onclick="gerarRelatorio('Relatório por espécie')"><div class="rep-ic">🝄</div><h4>Relatório por espécie</h4><p>Resumo de atendimentos segmentado por bovinos, equinos, ovinos, caprinos e suínos.</p></div>
+          <div class="rep-card" onclick="gerarRelatorio('Controle de vacinações')"><div class="rep-ic">💉</div><h4>Controle de vacinações</h4><p>Histórico e status de vacinação de todos os animais cadastrados.</p></div>
+          <div class="rep-card" onclick="gerarRelatorio('Animais em tratamento')"><div class="rep-ic">🝥</div><h4>Animais em tratamento</h4><p>Lista de animais com tratamentos ativos e seus respectivos protocolos.</p></div>
+          <div class="rep-card" onclick="gerarRelatorio('Produtividade do MV')"><div class="rep-ic">📈</div><h4>Produtividade do MV</h4><p>Atendimentos, visitas, procedimentos e consultas por período.</p></div>
+        </div>
+        <div class="card">
+          <div class="ch"><h3>⚙︝ Configurar e Gerar Relatório</h3></div>
+          <div class="cbp">
+            <div class="fg">
+              <div class="fgr"><label>Tipo de relatório</label><select id="rep-tipo"><option>Atendimentos por período</option><option>Fichas por propriedade</option><option>Relatório por espécie</option><option>Controle de vacinações</option><option>Animais em tratamento</option></select></div>
+              <div class="fgr"><label>Período – De</label><input type="date" value="2026-10-01"></div>
+              <div class="fgr"><label>Período – Até</label><input type="date" value="2026-10-20"></div>
+              <div class="fgr"><label>Propriedade</label><select><option>Todas</option><option>Faz. Boa Vista</option><option>Haras São Lucas</option><option>Cap. Serra Azul</option><option>Granja Esperança</option></select></div>
+              <div class="fgr"><label>Espécie</label><select><option>Todas</option><option>Bovino</option><option>Equino</option><option>Ovino</option><option>Caprino</option><option>Suíno</option></select></div>
+              <div class="fgr"><label>Formato</label><select><option>PDF</option><option>Excel</option><option>Impressão</option></select></div>
+            </div>
+            <div class="fax">
+              <button class="bsv" onclick="gerarRelatorio()">📄 Gerar Relatório</button>
+              <button class="bcn">Limpar filtros</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ╝╝ CONFIG ╝╝ -->
+      <div class="panel" id="p-config">
+        <div class="card">
+          <div class="ch"><h3>⚙︝ Configurações da Conta</h3></div>
+          <div class="cbp">
+            <div class="fg">
+              <div class="fgr"><label>Nome completo</label><input type="text" value="Dra. Ana Fernandes"></div>
+              <div class="fgr"><label>CRMV</label><input type="text" value="CRMV-SP 12345"></div>
+              <div class="fgr"><label>E-mail</label><input type="email" value="ana.fernandes@vetpratica.com"></div>
+              <div class="fgr"><label>Telefone / WhatsApp</label><input type="tel" value="(11) 99999-0000"></div>
+              <div class="fgr"><label>Especialidade</label><select><option>Clínica de grandes animais</option><option>Reprodução animal</option><option>Cirurgia</option><option>Sanidade animal</option></select></div>
+              <div class="fgr"><label>Estado (UF)</label><select><option>SP</option><option>MG</option><option>GO</option><option>MT</option><option>MS</option></select></div>
+            </div>
+            <div class="fax"><button class="bsv" onclick="toast('Configurações salvas!')">💾 Salvar Alterações</button></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ch"><h3>🔒 Alterar Senha</h3></div>
+          <div class="cbp">
+            <div class="fg">
+              <div class="fgr"><label>Senha atual</label><input type="password" placeholder="••••••••"></div>
+              <div class="fgr"><label>Nova senha</label><input type="password" placeholder="••••••••"></div>
+              <div class="fgr"><label>Confirmar nova senha</label><input type="password" placeholder="••••••••"></div>
+            </div>
+            <div class="fax"><button class="bsv" onclick="toast('Senha alterada!')">🔝 Alterar Senha</button></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </main>
+</div><!-- /layout -->
+
+<!-- MODAIS -->
+<!-- Modal Novo Paciente -->
+<div class="movo" id="m-pac" onclick="fecharModal('m-pac',event)">
+  <div class="modb">
+    <button class="modb-x" onclick="fecharModal('m-pac')">✕</button>
+    <h3>➕ Cadastrar Novo Paciente</h3>
+    <div class="fg">
+      <div class="fgr"><label>Nome / Apelido</label><input type="text" placeholder="Ex: Estrela"></div>
+      <div class="fgr"><label>Numeração oficial</label><input type="text" placeholder="Ex: #042"></div>
+      <div class="fgr"><label>Espécie</label><select><option>Bovino</option><option>Equino</option><option>Ovino</option><option>Caprino</option><option>Suíno</option></select></div>
+      <div class="fgr"><label>Raça</label><input type="text" placeholder="Ex: Nelore, Quarto de Milha..."></div>
+      <div class="fgr"><label>Sexo</label><select><option>Fêmea</option><option>Macho</option></select></div>
+      <div class="fgr"><label>Data de nascimento</label><input type="date"></div>
+      <div class="fgr"><label>Peso (kg)</label><input type="number" placeholder="Ex: 480"></div>
+      <div class="fgr"><label>Propriedade / Rebanho</label><select><option>Faz. Boa Vista</option><option>Haras São Lucas</option><option>Cap. Serra Azul</option><option>Granja Esperança</option><option>Faz. São Bento</option><option>Novo...</option></select></div>
+      <div class="fgr full"><label>Observações iniciais</label><textarea rows="2" placeholder="Informações relevantes..."></textarea></div>
+    </div>
+    <div class="fax"><button class="bsv" onclick="fecharModal('m-pac');toast('Paciente cadastrado!')">💾 Cadastrar Paciente</button><button class="bcn" onclick="fecharModal('m-pac')">Cancelar</button></div>
+  </div>
+</div>
+
+<!-- Modal Ficha Completa -->
+<div class="movo" id="m-ficha" onclick="fecharModal('m-ficha',event)">
+  <div class="modb" style="max-width:680px">
+    <button class="modb-x" onclick="fecharModal('m-ficha')">✕</button>
+    <h3>📋 Ficha Clínica – Bovino #042 "Estrela"</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px;padding:14px;background:#f9f9f9;border-radius:8px;font-size:.83rem">
+      <div><strong>Espécie:</strong> Bovino · Nelore</div>
+      <div><strong>Sexo:</strong> Fêmea</div>
+      <div><strong>Peso:</strong> 485 kg</div>
+      <div><strong>Idade:</strong> 4 anos</div>
+      <div><strong>Propriedade:</strong> Faz. Boa Vista</div>
+      <div><strong>Status:</strong> <span class="bdg ok">Saudável</span></div>
+    </div>
+    <h4 style="font-size:.88rem;font-weight:700;margin-bottom:10px;color:var(--t1)">📂 Histórico de atendimentos</h4>
+    <table>
+      <thead><tr><th>Data</th><th>Tipo</th><th>Diagnóstico</th><th>MV</th></tr></thead>
+      <tbody>
+        <tr><td>20/10/2026</td><td>Retorno</td><td>Pós-cirurgia (rúmen)</td><td>Dra. Ana</td></tr>
+        <tr><td>01/10/2026</td><td>Cirurgia</td><td>Ruminotomia</td><td>Dra. Ana</td></tr>
+        <tr><td>15/09/2026</td><td>Consulta</td><td>Timpanismo</td><td>Dra. Ana</td></tr>
+        <tr><td>10/08/2026</td><td>Vacinação</td><td>Aftosa + Brucelose</td><td>Dr. Carlos</td></tr>
+      </tbody>
+    </table>
+    <div class="fax"><button class="bsv" onclick="toast('PDF gerado!')">📄 Exportar PDF</button><button class="bcn" onclick="fecharModal('m-ficha')">Fechar</button></div>
+  </div>
+</div>
+
+<!-- Modal Novo Rebanho -->
+<div class="movo" id="m-reb" onclick="fecharModal('m-reb',event)">
+  <div class="modb">
+    <button class="modb-x" onclick="fecharModal('m-reb')">✕</button>
+    <h3>🝄 Cadastrar Novo Rebanho</h3>
+    <div class="fg">
+      <div class="fgr"><label>Nome do rebanho / lote</label><input type="text" placeholder="Ex: Rebanho Nelore 2026"></div>
+      <div class="fgr"><label>Espécie</label><select><option>Bovino</option><option>Equino</option><option>Ovino</option><option>Caprino</option><option>Suíno</option></select></div>
+      <div class="fgr"><label>Propriedade rural</label><input type="text" placeholder="Nome da fazenda/sítio"></div>
+      <div class="fgr"><label>Município / Estado</label><input type="text" placeholder="Ex: Ribeirão Preto, SP"></div>
+      <div class="fgr"><label>Qtd. de animais</label><input type="number" placeholder="Ex: 48"></div>
+      <div class="fgr"><label>Responsável / Produtor</label><input type="text" placeholder="Nome do produtor"></div>
+      <div class="fgr full"><label>Observações</label><textarea rows="2" placeholder="Informações sobre o manejo, pastagem, sistema..."></textarea></div>
+    </div>
+    <div class="fax"><button class="bsv" onclick="fecharModal('m-reb');toast('Rebanho cadastrado!')">💾 Cadastrar Rebanho</button><button class="bcn" onclick="fecharModal('m-reb')">Cancelar</button></div>
+  </div>
+</div>
+
+<!-- Modal Novo Evento Agenda -->
+<div class="movo" id="m-ev" onclick="fecharModal('m-ev',event)">
+  <div class="modb">
+    <button class="modb-x" onclick="fecharModal('m-ev')">✕</button>
+    <h3>📅 Novo Evento na Agenda</h3>
+    <div class="fg">
+      <div class="fgr full"><label>Título / Descrição</label><input type="text" placeholder="Ex: Consulta Bovino #042 – Retorno"></div>
+      <div class="fgr"><label>Tipo</label><select><option>Consulta</option><option>Retorno</option><option>Visita de campo</option><option>Vacinação</option><option>Cirurgia</option><option>Exame</option><option>Urgência</option></select></div>
+      <div class="fgr"><label>Data</label><input type="date" value="2026-10-21"></div>
+      <div class="fgr"><label>Horário</label><input type="time" value="09:00"></div>
+      <div class="fgr"><label>Propriedade / Local</label><input type="text" placeholder="Ex: Faz. Boa Vista"></div>
+      <div class="fgr"><label>Animal / Rebanho</label><input type="text" placeholder="Ex: Bovino #042 ou Lote A"></div>
+      <div class="fgr full"><label>Observações</label><textarea rows="2" placeholder="Materiais necessários, instruções especiais..."></textarea></div>
+    </div>
+    <div class="fax"><button class="bsv" onclick="fecharModal('m-ev');toast('Evento adicionado à agenda!')">📅 Agendar</button><button class="bcn" onclick="fecharModal('m-ev')">Cancelar</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast-msg"></div>
+
+<script>
+  const titles={dashboard:['Dashboard','Bem-vinda, Dra. Ana! Você tem 8 consultas hoje.'],pacientes:['Pacientes','Gerencie os pacientes cadastrados.'],rebanhos:['Rebanhos','Rebanhos e propriedades vinculadas.'],fichas:['Fichas Clínicas','Histórico completo de atendimentos.'],calc:['Calculadora de Doses','Calcule doses e converta unidades.'],agenda:['Agenda','Consultas, retornos e visitas de campo.'],relatorios:['Relatórios','Gere e exporte relatórios de atendimentos.'],config:['Configurações','Dados da conta e preferências.']};
+
+  function show(id,el){
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+    document.getElementById('p-'+id).classList.add('active');
+    if(el)el.classList.add('active');
+    else{document.querySelectorAll('.ni').forEach(n=>{if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+id+"'"))n.classList.add('active');});}
+    if(titles[id]){document.getElementById('pagetitle').textContent=titles[id][0];document.getElementById('pagesub').textContent=titles[id][1];}
+  }
+
+  function abrirModal(id){document.getElementById(id).classList.add('on');document.body.style.overflow='hidden';}
+  function fecharModal(id,e){if(!e||e.target.id===id){document.getElementById(id).classList.remove('on');document.body.style.overflow='';}}
+
+  function calcDash(){
+    const p=parseFloat(document.getElementById('dc-peso').value);
+    const d=parseFloat(document.getElementById('dc-dose').value);
+    const c=parseFloat(document.getElementById('dc-conc').value);
+    const v=document.getElementById('dc-via').value;
+    const esp=document.getElementById('dc-esp').value;
+    const med=document.getElementById('dc-med').value;
+    if(!p||!d||!c){alert('Preencha peso, dose e concentração.');return;}
+    const mg=p*d,ml=mg/c;
+    document.getElementById('dcrv').textContent=ml.toFixed(2)+' mL';
+    document.getElementById('dcrl').textContent=`a administrar via ${v}`;
+    document.getElementById('dcrd').textContent=`${esp}${med?' · '+med:''} · ${p} kg · ${mg.toFixed(1)} mg totais · Conc: ${c} mg/mL`;
+    document.getElementById('dcres').classList.add('on');
+  }
+
+  const convFat={mg:1,g:1000,kg:1e6,mL:1,L:1000,UI:1000};
+  function converter(){
+    const v=parseFloat(document.getElementById('uv-in').value);
+    const f=document.getElementById('uv-from').value;
+    const t=document.getElementById('uv-to').value;
+    const r=document.getElementById('convres');
+    if(!v||isNaN(v)){r.classList.remove('on');return;}
+    const res=v*(convFat[f]||1)/(convFat[t]||1);
+    r.textContent=`${v} ${f} = ${res.toFixed(4)} ${t}`;
+    r.classList.add('on');
+  }
+
+  function salvarFicha(){document.getElementById('new-ficha').style.display='none';toast('Ficha clínica salva com sucesso!');}
+  function gerarRelatorio(tipo){const t=tipo||document.getElementById('rep-tipo').value;toast('Gerando relatório: '+t);}
+
+  function filtrarTabela(v){
+    const rows=document.querySelectorAll('#tabPac tbody tr');
+    rows.forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(v.toLowerCase())?'':'none';});
+  }
+
+  function toast(msg){const t=document.getElementById('toast-msg');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),3000);}
+</script>
+</body>
+</html>
+
+

@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VetPr&aacute;tica &ndash; Assistente da Rotina Veterin&aacute;ria</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --v1:#2d5a1b;--v2:#4a7a2d;--v3:#6b9e40;--vs:#e8f2dc;
+  --bege:#faf3e7;--bege2:#f0e8d5;--bege3:#c8b89a;
+  --terra:#8b6914;--terra2:#a0845c;
+  --tx:#2c2c2c;--txs:#5a5a5a;--wh:#fff;
+  --sh:0 2px 10px rgba(0,0,0,.09);--shm:0 4px 22px rgba(0,0,0,.13);
+  --r:10px;--tr:.25s ease;
+  --serif:'Georgia','Times New Roman',serif
+}
+html{scroll-behavior:smooth}
+body{font-family:'Segoe UI',system-ui,sans-serif;color:var(--tx);line-height:1.6;background:var(--wh)}
+a{text-decoration:none;color:inherit}
+
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:900;
+  background:rgba(255,255,255,.97);backdrop-filter:blur(8px);
+  border-bottom:2px solid var(--bege2);
+  height:70px;padding:0 5%;
+  display:flex;align-items:center;justify-content:space-between
+}
+.logo{display:flex;align-items:center;gap:11px}
+.logo img{width:44px;height:44px;object-fit:contain}
+.logo-nm{font-family:var(--serif);font-size:1.25rem;font-weight:700;color:var(--v1);line-height:1.1}
+.logo-sub{display:block;font-size:.6rem;font-weight:400;color:var(--terra2);letter-spacing:.5px;font-style:italic}
+.nl{list-style:none;display:flex;align-items:center;gap:20px}
+.nl a{font-size:.88rem;font-weight:500;color:var(--txs);transition:color var(--tr)}
+.nl a:hover{color:var(--v1)}
+.btn-ent{background:var(--v1)!important;color:var(--wh)!important;padding:8px 22px;border-radius:50px!important}
+.btn-ent:hover{background:var(--v2)!important}
+.btn-cad{border:2px solid var(--v1)!important;color:var(--v1)!important;padding:6px 20px;border-radius:50px!important;transition:all var(--tr)!important}
+.btn-cad:hover{background:var(--v1)!important;color:var(--wh)!important}
+.hbg{display:none;background:none;border:none;cursor:pointer;flex-direction:column;gap:5px;padding:4px}
+.hbg span{display:block;width:24px;height:2.5px;background:var(--tx);border-radius:3px}
+
+/* HERO */
+#hero{
+  min-height:100vh;padding:90px 5% 60px;
+  background:linear-gradient(160deg,#e8f2dc 0%,#faf3e7 55%,#f0e8d5 100%);
+  display:flex;align-items:center
+}
+.hero-wrap{display:flex;align-items:center;gap:60px;max-width:1200px;margin:0 auto;width:100%;flex-wrap:wrap}
+.hero-txt{flex:1 1 380px}
+.hero-kicker{
+  display:inline-block;font-size:.78rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:1.5px;
+  color:var(--terra);background:var(--bege2);
+  padding:6px 16px;border-radius:50px;margin-bottom:20px;
+  border:1px solid var(--bege3)
+}
+.hero-h1{
+  font-family:var(--serif);
+  font-size:clamp(2rem,4.5vw,3.2rem);
+  font-weight:700;font-style:italic;
+  color:var(--v1);line-height:1.2;margin-bottom:18px
+}
+.hero-p{font-size:1.05rem;color:var(--txs);max-width:480px;margin-bottom:36px}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap}
+.btn-prim{
+  background:var(--v1);color:var(--wh);
+  padding:13px 28px;border-radius:50px;
+  font-size:.95rem;font-weight:700;
+  box-shadow:0 4px 14px rgba(45,90,27,.3);
+  transition:background var(--tr),transform var(--tr)
+}
+.btn-prim:hover{background:var(--v2);transform:translateY(-2px)}
+.btn-sec{
+  border:2px solid var(--v1);color:var(--v1);
+  padding:11px 26px;border-radius:50px;
+  font-size:.95rem;font-weight:700;transition:all var(--tr)
+}
+.btn-sec:hover{background:var(--v1);color:var(--wh)}
+/* Logo grande no hero */
+.hero-logo{flex:1 1 300px;display:flex;justify-content:center;align-items:center}
+.hero-logo img{max-width:280px;width:100%;filter:drop-shadow(0 6px 20px rgba(45,90,27,.20))}
+
+/* ESPECIES BAR */
+.esp-bar{background:var(--v1);color:var(--wh);padding:40px 5%}
+.esp-lbl{
+  text-align:center;font-size:.75rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:2px;
+  opacity:.75;margin-bottom:28px;font-style:italic
+}
+.esp-grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:16px;max-width:1100px;margin:0 auto
+}
+.esp-card{
+  border-radius:12px;overflow:hidden;cursor:pointer;
+  position:relative;aspect-ratio:4/3;
+  box-shadow:0 4px 14px rgba(0,0,0,.25);
+  transition:transform var(--tr),box-shadow var(--tr);
+  background:var(--v2)
+}
+.esp-card:hover{transform:translateY(-5px) scale(1.02);box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.esp-card img{
+  width:100%;height:100%;object-fit:cover;
+  display:block;transition:transform .4s ease;
+  filter:brightness(0.85)
+}
+.esp-card:hover img{transform:scale(1.07);filter:brightness(0.7)}
+.esp-overlay{
+  position:absolute;bottom:0;left:0;right:0;
+  background:linear-gradient(transparent,rgba(0,0,0,.72));
+  padding:10px 12px 12px;
+  text-align:center
+}
+.esp-overlay .en{
+  font-size:.95rem;font-weight:800;color:var(--wh);
+  letter-spacing:.3px;display:block
+}
+.esp-overlay .ec{font-size:.72rem;color:rgba(255,255,255,.82);margin-top:2px;display:block}
+.esp-overlay .ea{
+  margin-top:6px;font-size:.72rem;font-weight:700;
+  color:rgba(255,255,255,.75);
+  border:1px solid rgba(255,255,255,.4);
+  display:inline-block;padding:3px 10px;border-radius:50px
+}
+
+/* SECTIONS */
+section{padding:88px 5%}
+.tag{
+  display:inline-block;font-size:.7rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:1.5px;
+  padding:5px 14px;border-radius:50px;margin-bottom:12px
+}
+.tag-v{background:var(--vs);color:var(--v1)}
+.tag-t{background:var(--bege2);color:var(--terra)}
+.stitle{
+  font-family:var(--serif);
+  font-size:clamp(1.6rem,3vw,2.3rem);
+  font-weight:700;font-style:italic;
+  color:var(--v1);margin-bottom:12px
+}
+.ssub{color:var(--txs);font-size:1rem;max-width:520px;margin-bottom:44px}
+.tc{text-align:center}
+.tc .ssub{margin-left:auto;margin-right:auto}
+
+/* FEATURES 4 */
+#features{background:var(--bege)}
+.feat4{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:24px;margin-top:44px}
+.f4c{
+  background:var(--wh);border-radius:var(--r);
+  padding:28px 22px;box-shadow:var(--sh);
+  border-top:3px solid transparent;
+  transition:border-color var(--tr),transform var(--tr)
+}
+.f4c:hover{border-color:var(--v2);transform:translateY(-4px)}
+.f4ic{font-size:2rem;margin-bottom:12px;color:var(--v1)}
+.f4c h3{font-size:.95rem;font-weight:700;color:var(--v1);margin-bottom:6px}
+.f4c p{font-size:.87rem;color:var(--txs)}
+
+/* COMO FUNCIONA */
+#como{background:var(--wh)}
+.steps{display:flex;gap:24px;flex-wrap:wrap;justify-content:center}
+.step{
+  background:var(--bege);border-radius:var(--r);
+  padding:28px 22px;flex:1 1 200px;max-width:240px;
+  box-shadow:var(--sh);text-align:center;
+  border:1px solid var(--bege2)
+}
+.stn{
+  width:40px;height:40px;background:var(--v1);color:var(--wh);
+  border-radius:50%;font-weight:800;font-size:1rem;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 12px
+}
+.step h3{font-size:.93rem;font-weight:700;color:var(--v1);margin-bottom:6px}
+.step p{font-size:.85rem;color:var(--txs)}
+
+/* PORTAIS */
+#portais{background:var(--bege)}
+.portal-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.portal-card{
+  border-radius:16px;overflow:hidden;
+  box-shadow:var(--shm);
+  transition:transform var(--tr);
+  border:2px solid transparent
+}
+.portal-card:hover{transform:translateY(-5px)}
+.portal-card.mv{border-color:var(--v2)}
+.portal-card.prod{border-color:var(--terra)}
+.portal-head{padding:32px 28px}
+.portal-head.mv{background:linear-gradient(135deg,var(--v1),var(--v2))}
+.portal-head.prod{background:linear-gradient(135deg,var(--terra),var(--terra2))}
+.portal-icon{font-size:2.8rem;margin-bottom:14px}
+.portal-head h2{font-family:var(--serif);font-size:1.4rem;font-weight:700;color:var(--wh);margin-bottom:8px}
+.portal-head p{font-size:.9rem;color:rgba(255,255,255,.85)}
+.portal-body{background:var(--wh);padding:22px 28px}
+.portal-items{list-style:none;display:flex;flex-direction:column;gap:9px;margin-bottom:20px}
+.portal-items li{display:flex;align-items:center;gap:10px;font-size:.88rem;color:var(--txs)}
+.portal-items li::before{content:'\2713';font-weight:700;color:var(--v2)}
+.portal-card.prod .portal-items li::before{color:var(--terra)}
+.portal-btn{
+  display:block;text-align:center;padding:11px;
+  border-radius:50px;font-size:.9rem;font-weight:700;
+  transition:all var(--tr);cursor:pointer
+}
+.portal-btn.mv{background:var(--vs);color:var(--v1)}
+.portal-btn.mv:hover{background:var(--v1);color:var(--wh)}
+.portal-btn.prod{background:var(--bege2);color:var(--terra)}
+.portal-btn.prod:hover{background:var(--terra);color:var(--wh)}
+
+/* CALCULADORA */
+#calc{background:linear-gradient(135deg,var(--vs),var(--bege))}
+.clo{display:flex;gap:60px;align-items:flex-start;flex-wrap:wrap}
+.cinf{flex:1 1 280px}
+.cwi{
+  flex:1 1 320px;background:var(--wh);
+  border-radius:16px;padding:32px;
+  box-shadow:var(--shm);border:1px solid var(--bege2)
+}
+.cwi h3{font-family:var(--serif);font-size:1rem;font-weight:700;color:var(--v1);margin-bottom:20px;font-style:italic}
+.cg{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.cg label{font-size:.79rem;font-weight:600;color:var(--txs)}
+.cg input,.cg select{
+  padding:10px 12px;border:1.5px solid var(--bege2);
+  border-radius:8px;font-size:.88rem;
+  font-family:inherit;background:var(--bege);
+  transition:border-color var(--tr)
+}
+.cg input:focus,.cg select:focus{outline:none;border-color:var(--v2);background:var(--wh)}
+.crow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btnc{
+  width:100%;background:var(--v1);color:var(--wh);
+  border:none;padding:12px;border-radius:50px;
+  font-size:.93rem;font-weight:700;cursor:pointer;
+  transition:background var(--tr);margin-top:6px;font-family:inherit
+}
+.btnc:hover{background:var(--v2)}
+.cres{
+  background:var(--vs);border-radius:10px;
+  padding:18px;text-align:center;
+  margin-top:14px;display:none;
+  border:1px solid #c8e0a8
+}
+.cres.on{display:block}
+.crv{font-size:2.2rem;font-weight:800;color:var(--v1);font-family:var(--serif)}
+.crl{font-size:.82rem;color:var(--txs);margin-top:4px}
+.crd{font-size:.76rem;color:var(--txs);margin-top:8px}
+
+/* PROXIMAS ATIVIDADES */
+#atividades{background:var(--wh)}
+.ativ-layout{display:grid;grid-template-columns:1.4fr 1fr;gap:28px}
+.card{background:var(--wh);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;border:1px solid var(--bege2)}
+.ch{padding:16px 20px;border-bottom:1px solid var(--bege2);display:flex;align-items:center;justify-content:space-between;background:var(--bege)}
+.ch h3{font-size:.93rem;font-weight:700;color:var(--v1)}
+.cbp{padding:18px 20px}
+.ativ-item{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--bege2)}
+.ativ-item:last-child{border-bottom:none}
+.ativ-dt{background:var(--v1);color:var(--wh);border-radius:8px;padding:8px 10px;text-align:center;flex-shrink:0;min-width:50px}
+.ativ-dt .dd{font-size:1.3rem;font-weight:800;line-height:1}
+.ativ-dt .dm{font-size:.66rem;text-transform:uppercase;opacity:.85}
+.ativ-info{flex:1}
+.ativ-title{font-size:.9rem;font-weight:700;color:var(--tx);margin-bottom:2px}
+.ativ-sub{font-size:.77rem;color:var(--txs)}
+.bdg{display:inline-block;padding:3px 9px;border-radius:50px;font-size:.7rem;font-weight:700}
+.ok{background:var(--vs);color:var(--v1)}
+.al{background:#fff3e0;color:#a05000}
+.urg{background:#fce4ec;color:#b00020}
+.inf{background:#e3f2fd;color:#1a5c9e}
+
+/* PLANOS */
+#planos{background:var(--bege)}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:24px}
+.plan{
+  background:var(--wh);border-radius:16px;
+  padding:32px 26px;box-shadow:var(--sh);
+  position:relative;border:2px solid transparent;
+  transition:transform var(--tr),border-color var(--tr)
+}
+.plan:hover{transform:translateY(-4px);border-color:var(--v2)}
+.plan.hl{background:linear-gradient(145deg,var(--v1),var(--v2));color:var(--wh)}
+.pbadge{
+  position:absolute;top:-12px;left:50%;transform:translateX(-50%);
+  background:var(--terra);color:var(--wh);
+  font-size:.7rem;font-weight:700;
+  padding:4px 14px;border-radius:50px;white-space:nowrap
+}
+.plan h3{font-size:.9rem;font-weight:600;opacity:.8;margin-bottom:10px}
+.prc{font-family:var(--serif);font-size:2.4rem;font-weight:700;margin-bottom:4px}
+.pdc{font-size:.8rem;opacity:.7;margin-bottom:22px}
+.plan ul{list-style:none;display:flex;flex-direction:column;gap:9px;margin-bottom:24px}
+.plan li{display:flex;align-items:center;gap:9px;font-size:.88rem}
+.plan li::before{content:'\2713';color:var(--v2);font-weight:700}
+.plan.hl li::before{color:#a5d6a7}
+.pbtn{
+  display:block;text-align:center;padding:11px;border-radius:50px;
+  font-size:.9rem;font-weight:700;
+  border:2px solid var(--v1);color:var(--v1);transition:all var(--tr)
+}
+.pbtn:hover{background:var(--v1);color:var(--wh)}
+.plan.hl .pbtn{border-color:var(--wh);color:var(--wh)}
+.plan.hl .pbtn:hover{background:var(--wh);color:var(--v1)}
+
+/* CTA */
+.cta{background:linear-gradient(135deg,var(--v1),var(--v2));color:var(--wh);padding:70px 5%;text-align:center}
+.cta h2{font-family:var(--serif);font-style:italic;font-size:clamp(1.5rem,3vw,2.2rem);font-weight:700;margin-bottom:12px}
+.cta p{opacity:.9;margin-bottom:28px;font-size:1rem}
+.ctabs{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.ctaw{background:var(--wh);color:var(--v1);padding:13px 30px;border-radius:50px;font-size:.95rem;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,.2);transition:transform var(--tr),box-shadow var(--tr)}
+.ctaw:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.28)}
+.ctao{border:2px solid rgba(255,255,255,.65);color:var(--wh);padding:11px 28px;border-radius:50px;font-size:.95rem;font-weight:700;transition:background var(--tr)}
+.ctao:hover{background:rgba(255,255,255,.15)}
+
+/* FOOTER */
+footer{background:#1a2e0d;color:#aaa;padding:56px 5% 26px}
+.fgrid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:36px;margin-bottom:44px}
+.fbl .flogo{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.fbl .flogo img{width:70px;height:auto;filter:brightness(1.1) drop-shadow(0 2px 6px rgba(0,0,0,.3))}
+.fbl .flogo-text{color:var(--wh);font-family:var(--serif);font-size:1.2rem;font-weight:700;font-style:italic}
+.fbl .flogo-sub{font-size:.72rem;color:#888;font-style:italic;display:block}
+.fbl p{font-size:.87rem;line-height:1.8}
+.fcol h4{color:var(--wh);font-size:.9rem;font-weight:700;margin-bottom:14px}
+.fcol ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+.fcol a{font-size:.87rem;color:#888;transition:color var(--tr)}
+.fcol a:hover{color:#a5d6a7}
+.fbot{border-top:1px solid rgba(255,255,255,.07);padding-top:22px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-size:.82rem}
+.fbot a{color:#a5d6a7}
+
+/* MODAL */
+.ov{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.58);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;padding:16px}
+.ov.on{opacity:1;pointer-events:all}
+.mdl{background:var(--wh);border-radius:18px;width:100%;max-width:420px;padding:36px;box-shadow:0 20px 60px rgba(0,0,0,.3);position:relative;transform:translateY(16px);transition:transform .3s}
+.ov.on .mdl{transform:translateY(0)}
+.mdlx{position:absolute;top:14px;right:18px;background:none;border:none;font-size:1.3rem;cursor:pointer;color:#aaa}
+.mdlx:hover{color:#333}
+.mst{display:none}
+.mst.on{display:block}
+.mdl h2{font-family:var(--serif);font-size:1.35rem;font-weight:700;font-style:italic;color:var(--v1);margin-bottom:5px}
+.msub{font-size:.88rem;color:var(--txs);margin-bottom:24px}
+.rcs{display:flex;flex-direction:column;gap:14px}
+.rc{border:2px solid var(--bege2);border-radius:11px;padding:16px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:border-color var(--tr),background var(--tr)}
+.rc.mv:hover,.rc.mv.sel{border-color:var(--v2);background:var(--vs)}
+.rc.pr:hover,.rc.pr.sel{border-color:var(--terra);background:var(--bege2)}
+.rc h4{font-size:.95rem;font-weight:700;color:var(--tx);margin-bottom:2px}
+.rc p{font-size:.8rem;color:var(--txs)}
+.btnnx{display:block;width:100%;margin-top:20px;background:var(--v1);color:var(--wh);border:none;padding:13px;border-radius:50px;font-size:.92rem;font-weight:700;cursor:pointer;transition:background var(--tr);font-family:inherit}
+.btnnx:hover{background:var(--v2)}
+.btnnx:disabled{opacity:.45;cursor:not-allowed}
+.mg{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.mg label{font-size:.83rem;font-weight:600;color:var(--txs)}
+.mg input,.mg select{padding:11px 13px;border:1.5px solid var(--bege2);border-radius:8px;font-size:.92rem;font-family:inherit;background:var(--bege);transition:border-color var(--tr)}
+.mg input:focus,.mg select:focus{outline:none;border-color:var(--v2);background:var(--wh);box-shadow:0 0 0 3px rgba(74,122,45,.1)}
+.btnsub{width:100%;background:var(--v1);color:var(--wh);border:none;padding:13px;border-radius:50px;font-size:.92rem;font-weight:700;cursor:pointer;transition:background var(--tr);font-family:inherit}
+.btnsub:hover{background:var(--v2)}
+.mbk{background:none;border:none;cursor:pointer;color:var(--txs);font-size:.87rem;display:flex;align-items:center;gap:5px;margin-bottom:18px;transition:color var(--tr)}
+.mbk:hover{color:var(--v1)}
+.mdiv{text-align:center;font-size:.83rem;color:#ccc;margin:14px 0;position:relative}
+.mdiv::before,.mdiv::after{content:'';position:absolute;top:50%;width:36%;height:1px;background:var(--bege2)}
+.mdiv::before{left:0}
+.mdiv::after{right:0}
+.mfl{text-align:center;font-size:.86rem;color:var(--txs);margin-top:16px}
+.mfl a{color:var(--v2);font-weight:600}
+
+/* BTT */
+#btt{position:fixed;bottom:26px;right:26px;z-index:800;width:42px;height:42px;border-radius:50%;background:var(--v1);color:var(--wh);border:none;font-size:1rem;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.22);display:none;align-items:center;justify-content:center;transition:background var(--tr)}
+#btt.on{display:flex}
+#btt:hover{background:var(--v2)}
+
+@media(max-width:960px){
+  .portal-grid{grid-template-columns:1fr}
+  .ativ-layout{grid-template-columns:1fr}
+  .fgrid{grid-template-columns:1fr 1fr}
+  .clo,.hero-wrap{flex-direction:column}
+  .esp-grid{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:640px){
+  .nl{display:none;flex-direction:column;position:absolute;top:70px;left:0;right:0;background:var(--wh);padding:14px 5% 20px;box-shadow:0 8px 20px rgba(0,0,0,.1);gap:12px}
+  .nl.on{display:flex}
+  .hbg{display:flex}
+  .esp-grid{grid-template-columns:repeat(2,1fr)}
+  .fgrid{grid-template-columns:1fr}
+  .crow{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="logo">
+    <img src="logo.PNG" alt="VetPr&aacute;tica" style="width:44px;height:44px;object-fit:contain;border-radius:6px">
+    <div>
+      <span class="logo-nm">VetPr&aacute;tica</span>
+      <small class="logo-sub">Trabalho que gera valor</small>
+    </div>
+  </a>
+  <ul class="nl" id="nl">
+    <li><a href="#features">In&iacute;cio</a></li>
+    <li><a href="#portais">Esp&eacute;cies</a></li>
+    <li><a href="#como">Manejo</a></li>
+    <li><a href="#atividades">Sa&uacute;de</a></li>
+    <li><a href="#planos">Planos</a></li>
+    <li><a href="#" onclick="return openM('cad')" class="btn-cad">Cadastrar</a></li>
+    <li><a href="#" onclick="return openM('log')" class="btn-ent">Entrar</a></li>
+  </ul>
+  <button class="hbg" id="hbg"><span></span><span></span><span></span></button>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-wrap">
+    <div class="hero-txt">
+      <span class="hero-kicker">Bem-vindo &agrave; plataforma</span>
+      <h1 class="hero-h1">Produ&ccedil;&atilde;o, bem-estar<br>e sustentabilidade!</h1>
+      <p class="hero-p">Aqui, cuidamos de cada animal com dedica&ccedil;&atilde;o, respeito e compromisso com a qualidade em todas as etapas da produ&ccedil;&atilde;o.</p>
+      <div class="hero-btns">
+        <a href="#portais" class="btn-prim">Conhe&ccedil;a nossas especialidades &rarr;</a>
+        <a href="#" onclick="return openM('log')" class="btn-sec">Acessar plataforma</a>
+      </div>
+    </div>
+    <div class="hero-logo">
+      <img src="logo.PNG" alt="VetPr&aacute;tica &ndash; Assistente da Rotina Veterin&aacute;ria">
+    </div>
+  </div>
+</section>
+
+<!-- ESPECIES -->
+<div class="esp-bar">
+  <div class="esp-lbl">Nossas esp&eacute;cies &mdash; Conhe&ccedil;a um pouco mais sobre cada uma das nossas cria&ccedil;&otilde;es</div>
+  <div class="esp-grid">
+
+    <a class="esp-card" href="especies/bovinos.html">
+      <img
+        src="BOVINOS.PNG.PNG"
+        alt="Bovinos"
+        loading="lazy">
+      <div class="esp-overlay">
+        <span class="en">Bovinos</span>
+        <span class="ec">Corte e leite</span>
+        <span class="ea">Ver esp&eacute;cie &rarr;</span>
+      </div>
+    </a>
+
+    <a class="esp-card" href="especies/equinos.html">
+      <img
+        src="equino.png"
+        alt="Equinos"
+        loading="lazy">
+      <div class="esp-overlay">
+        <span class="en">Equinos</span>
+        <span class="ec">Trabalho e esporte</span>
+        <span class="ea">Ver esp&eacute;cie &rarr;</span>
+      </div>
+    </a>
+
+    <a class="esp-card" href="especies/ovinos.html">
+      <img
+        src="CAPRINOS.PNG.PNG"
+        alt="Ovinos"
+        loading="lazy">
+      <div class="esp-overlay">
+        <span class="en">Ovinos</span>
+        <span class="ec">Carne e l&atilde;</span>
+        <span class="ea">Ver esp&eacute;cie &rarr;</span>
+      </div>
+    </a>
+
+    <a class="esp-card" href="especies/caprinos.html">
+      <img
+        src="CAPRINO.PNG.PNG"
+        alt="Caprinos"
+        loading="lazy">
+      <div class="esp-overlay">
+        <span class="en">Caprinos</span>
+        <span class="ec">Leite e carne</span>
+        <span class="ea">Ver esp&eacute;cie &rarr;</span>
+      </div>
+    </a>
+
+    <a class="esp-card" href="especies/suinos.html">
+      <img
+        src="SUINO.PNG.PNG"
+        alt="Su&iacute;nos"
+        loading="lazy">
+      <div class="esp-overlay">
+        <span class="en">Su&iacute;nos</span>
+        <span class="ec">Produ&ccedil;&atilde;o e corte</span>
+        <span class="ea">Ver esp&eacute;cie &rarr;</span>
+      </div>
+    </a>
+
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="tc">
+    <span class="tag tag-v">Por que VetPr&aacute;tica</span>
+    <h2 class="stitle">Tudo que sua fazenda precisa</h2>
+    <p class="ssub">Uma plataforma completa para conectar m&eacute;dicos veterin&aacute;rios e produtores rurais em prol da sa&uacute;de e produtividade animal.</p>
+  </div>
+  <div class="feat4">
+    <div class="f4c">
+      <div class="f4ic">&#10003;</div>
+      <h3>Manejo de qualidade</h3>
+      <p>Mais sa&uacute;de e produtividade para o seu rebanho, com registros precisos de cada procedimento.</p>
+    </div>
+    <div class="f4c">
+      <div class="f4ic">&#9877;</div>
+      <h3>Acompanhamento veterin&aacute;rio</h3>
+      <p>Preven&ccedil;&atilde;o e cuidado em todas as fases, com fichas cl&iacute;nicas digitais e hist&oacute;rico completo.</p>
+    </div>
+    <div class="f4c">
+      <div class="f4ic">&#127807;</div>
+      <h3>Alimenta&ccedil;&atilde;o balanceada</h3>
+      <p>Nutri&ccedil;&atilde;o adequada para melhores resultados, com controle de estoque de ra&ccedil;&otilde;es e suplementos.</p>
+    </div>
+    <div class="f4c">
+      <div class="f4ic">&#9854;</div>
+      <h3>Sustentabilidade</h3>
+      <p>Produzindo hoje, preservando o amanh&atilde;. Relat&oacute;rios de desempenho e indicadores de produ&ccedil;&atilde;o.</p>
+    </div>
+  </div>
+</section>
+
+<!-- COMO FUNCIONA -->
+<section id="como">
+  <div class="tc">
+    <span class="tag tag-t">Simples e r&aacute;pido</span>
+    <h2 class="stitle">Como o VetPr&aacute;tica funciona</h2>
+    <p class="ssub">Em minutos voc&ecirc; est&aacute; gerenciando sua pr&aacute;tica veterin&aacute;ria ou o seu rebanho.</p>
+  </div>
+  <div class="steps">
+    <div class="step">
+      <div class="stn">1</div>
+      <h3>Crie sua conta</h3>
+      <p>Cadastre-se como MV ou Produtor Rural e configure seu perfil gratuitamente.</p>
+    </div>
+    <div class="step">
+      <div class="stn">2</div>
+      <h3>Cadastre os animais</h3>
+      <p>Adicione seu rebanho com dados completos de identifica&ccedil;&atilde;o e hist&oacute;rico.</p>
+    </div>
+    <div class="step">
+      <div class="stn">3</div>
+      <h3>Gerencie tudo</h3>
+      <p>Fichas, vacinas, consultas, exames e manejos em um s&oacute; lugar.</p>
+    </div>
+    <div class="step">
+      <div class="stn">4</div>
+      <h3>Conecte-se</h3>
+      <p>MV e produtor compartilham informa&ccedil;&otilde;es em tempo real.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PORTAIS -->
+<section id="portais">
+  <div class="tc" style="margin-bottom:44px">
+    <span class="tag tag-v">Acesso personalizado</span>
+    <h2 class="stitle">Escolha o seu portal</h2>
+    <p class="ssub">Dois ambientes distintos, cada um com os recursos certos para sua fun&ccedil;&atilde;o.</p>
+  </div>
+  <div class="portal-grid">
+
+    <div class="portal-card mv" onclick="openM('log','mv')">
+      <div class="portal-head mv">
+        <div class="portal-icon" style="font-size:2.8rem">&#128104;&#8205;&#9877;&#65039;</div>
+        <h2>Portal do M&eacute;dico Veterin&aacute;rio</h2>
+        <p>Gest&atilde;o cl&iacute;nica completa para grandes animais de produ&ccedil;&atilde;o.</p>
+      </div>
+      <div class="portal-body">
+        <ul class="portal-items">
+          <li>Fichas cl&iacute;nicas: nome, numera&ccedil;&atilde;o, sexo, esp&eacute;cie e ra&ccedil;a</li>
+          <li>Hist&oacute;rico de consultas, exames e procedimentos</li>
+          <li>Calculadora de doses e convers&atilde;o de unidades</li>
+          <li>Agenda: consultas, retornos e visitas &agrave;s propriedades</li>
+          <li>Gera&ccedil;&atilde;o e exporta&ccedil;&atilde;o de relat&oacute;rios em PDF</li>
+          <li>Cadastro de pacientes e gest&atilde;o de rebanhos</li>
+        </ul>
+        <span class="portal-btn mv" onclick="openM('log','mv')">Acessar Portal do MV &rarr;</span>
+      </div>
+    </div>
+
+    <div class="portal-card prod" onclick="openM('log','prod')">
+      <div class="portal-head prod">
+        <div class="portal-icon" style="font-size:2.8rem">&#127806;</div>
+        <h2>Portal do Produtor Rural</h2>
+        <p>Controle total do rebanho na palma da m&atilde;o.</p>
+      </div>
+      <div class="portal-body">
+        <ul class="portal-items">
+          <li>Cadastro individual por esp&eacute;cie com identifica&ccedil;&atilde;o</li>
+          <li>Organiza&ccedil;&atilde;o e identifica&ccedil;&atilde;o dos rebanhos por lotes</li>
+          <li>Hist&oacute;rico sanit&aacute;rio e reprodutivo completo</li>
+          <li>Registro de vacinas, tratamentos e procedimentos</li>
+          <li>Controle de manejos sanit&aacute;rios e nutricionais</li>
+          <li>Solicita&ccedil;&atilde;o de visitas do MV com grau de urg&ecirc;ncia</li>
+          <li>Lembretes de atividades sanit&aacute;rias e reprodutivas</li>
+        </ul>
+        <span class="portal-btn prod" onclick="openM('log','prod')">Acessar Portal do Produtor &rarr;</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CALCULADORA -->
+<section id="calc">
+  <div class="clo">
+    <div class="cinf">
+      <span class="tag tag-v">Ferramenta integrada</span>
+      <h2 class="stitle">Calculadora de Doses Veterin&aacute;rias</h2>
+      <p style="color:var(--txs);margin-bottom:20px;font-size:1rem">Calcule doses com precis&atilde;o para todas as esp&eacute;cies suportadas. Convers&atilde;o autom&aacute;tica de unidades inclu&iacute;da.</p>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:11px;margin-top:8px">
+        <li style="display:flex;align-items:center;gap:9px;font-size:.92rem;color:var(--txs)"><strong style="color:var(--v2)">&#10003;</strong> Bovinos, equinos, ovinos, caprinos e su&iacute;nos</li>
+        <li style="display:flex;align-items:center;gap:9px;font-size:.92rem;color:var(--txs)"><strong style="color:var(--v2)">&#10003;</strong> Convers&atilde;o autom&aacute;tica mg &rarr; mL</li>
+        <li style="display:flex;align-items:center;gap:9px;font-size:.92rem;color:var(--txs)"><strong style="color:var(--v2)">&#10003;</strong> Hist&oacute;rico vinculado ao animal no portal do MV</li>
+        <li style="display:flex;align-items:center;gap:9px;font-size:.92rem;color:var(--txs)"><strong style="color:var(--v2)">&#10003;</strong> Banco de medicamentos pr&eacute;-cadastrados</li>
+      </ul>
+    </div>
+    <div class="cwi">
+      <h3>Calculadora de Dose</h3>
+      <div class="crow">
+        <div class="cg">
+          <label>Esp&eacute;cie</label>
+          <select id="ce">
+            <option>Bovino</option><option>Equino</option>
+            <option>Ovino</option><option>Caprino</option><option>Su&iacute;no</option>
+          </select>
+        </div>
+        <div class="cg"><label>Peso (kg)</label><input type="number" id="cp" placeholder="Ex: 450" min="1" step="1"></div>
+      </div>
+      <div class="crow">
+        <div class="cg"><label>Dose (mg/kg)</label><input type="number" id="cd" placeholder="Ex: 2.5" min="0.01" step="0.01"></div>
+        <div class="cg"><label>Concentra&ccedil;&atilde;o (mg/mL)</label><input type="number" id="cc" placeholder="Ex: 50" min="0.01" step="0.01"></div>
+      </div>
+      <div class="cg">
+        <label>Via de administra&ccedil;&atilde;o</label>
+        <select id="cv">
+          <option>Intramuscular (IM)</option><option>Subcut&acirc;nea (SC)</option>
+          <option>Intravenosa (IV)</option><option>Oral (VO)</option>
+        </select>
+      </div>
+      <button class="btnc" onclick="calcDose()">Calcular Dose</button>
+      <div class="cres" id="cres">
+        <div class="crv" id="crv">&ndash;</div>
+        <div class="crl" id="crl">mL a administrar</div>
+        <div class="crd" id="crd"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROXIMAS ATIVIDADES -->
+<section id="atividades">
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px;margin-bottom:28px">
+    <div>
+      <span class="tag tag-t">Agenda da semana</span>
+      <h2 class="stitle" style="margin-bottom:4px">Pr&oacute;ximas atividades</h2>
+    </div>
+    <a href="#" onclick="return openM('log')" style="font-size:.9rem;color:var(--v2);font-weight:600">Ver todas &rarr;</a>
+  </div>
+  <div class="ativ-layout">
+    <div class="card">
+      <div class="ch"><h3>Outubro 2026 &mdash; Semana atual</h3></div>
+      <div class="cbp">
+        <div class="ativ-item">
+          <div class="ativ-dt" style="background:var(--v1)"><div class="dd">15</div><div class="dm">ABR</div></div>
+          <div class="ativ-info"><div class="ativ-title">Vacina&ccedil;&atilde;o do rebanho bovino</div><div class="ativ-sub">Bovinos &middot; 08:00 &middot; Lote A &mdash; 48 animais</div></div>
+          <span class="bdg al">Pr&oacute;ximo</span>
+        </div>
+        <div class="ativ-item">
+          <div class="ativ-dt" style="background:#c07000"><div class="dd">18</div><div class="dm">ABR</div></div>
+          <div class="ativ-info"><div class="ativ-title">Manejo sanit&aacute;rio dos su&iacute;nos</div><div class="ativ-sub">Su&iacute;nos &middot; 10:00 &middot; Granja &mdash; 173 animais</div></div>
+          <span class="bdg inf">Agendado</span>
+        </div>
+        <div class="ativ-item">
+          <div class="ativ-dt" style="background:var(--v2)"><div class="dd">22</div><div class="dm">ABR</div></div>
+          <div class="ativ-info"><div class="ativ-title">Revis&atilde;o de casqueamento dos equinos</div><div class="ativ-sub">Equinos &middot; 14:00 &middot; Plantel &mdash; 8 animais</div></div>
+          <span class="bdg inf">Agendado</span>
+        </div>
+        <div class="ativ-item">
+          <div class="ativ-dt" style="background:#7b1fa2"><div class="dd">25</div><div class="dm">ABR</div></div>
+          <div class="ativ-info"><div class="ativ-title">Controle de parasitas nos ovinos</div><div class="ativ-sub">Ovinos &middot; 09:00 &middot; Lote B &mdash; 30 animais</div></div>
+          <span class="bdg ok">Programado</span>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch"><h3>Destaques</h3></div>
+      <div class="cbp">
+        <div style="background:var(--bege);border-radius:8px;padding:14px;margin-bottom:14px;border:1px solid var(--bege2)">
+          <div style="font-size:.72rem;color:var(--terra);font-weight:600;margin-bottom:6px">10 de outubro de 2026</div>
+          <div style="font-size:.93rem;font-weight:700;color:var(--v1);margin-bottom:6px">Manejo de pastagens garante mais produtividade no rebanho</div>
+          <div style="font-size:.83rem;color:var(--txs)">Com um bom planejamento de pastagem, nossos animais t&ecirc;m mais sa&uacute;de, ganham peso e produzem melhor.</div>
+          <a href="#" style="font-size:.82rem;color:var(--v2);font-weight:600;display:block;margin-top:8px">Leia mais &rarr;</a>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;gap:10px;align-items:center;padding:10px;background:var(--vs);border-radius:8px;border:1px solid #c8e0a8">
+            <div style="font-size:1.5rem">&#128004;</div>
+            <div><div style="font-size:.85rem;font-weight:700;color:var(--v1)">284 animais cadastrados</div><div style="font-size:.76rem;color:var(--txs)">em 7 lotes ativos</div></div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;padding:10px;background:#fff3e0;border-radius:8px;border:1px solid #ffe0b2">
+            <div style="font-size:1.5rem">&#9888;</div>
+            <div><div style="font-size:.85rem;font-weight:700;color:#a05000">2 alertas sanit&aacute;rios</div><div style="font-size:.76rem;color:var(--txs)">requerem aten&ccedil;&atilde;o imediata</div></div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;padding:10px;background:var(--bege2);border-radius:8px;border:1px solid var(--bege3)">
+            <div style="font-size:1.5rem">&#128205;</div>
+            <div><div style="font-size:.85rem;font-weight:700;color:var(--terra)">3 visitas de MV</div><div style="font-size:.76rem;color:var(--txs)">agendadas esta semana</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PLANOS -->
+<section id="planos">
+  <div class="tc">
+    <span class="tag tag-v">Planos e pre&ccedil;os</span>
+    <h2 class="stitle">Escolha o plano ideal</h2>
+    <p class="ssub">Para MVs e produtores, com op&ccedil;&otilde;es que crescem com sua necessidade.</p>
+  </div>
+  <div class="pgrid">
+    <div class="plan">
+      <h3>Plano B&aacute;sico</h3>
+      <div class="prc"><sup style="font-size:.9rem;font-family:sans-serif">R$</sup>0<sub style="font-size:.85rem;font-family:sans-serif">/m&ecirc;s</sub></div>
+      <div class="pdc">Para come&ccedil;ar, sempre gr&aacute;tis</div>
+      <ul><li>At&eacute; 30 animais</li><li>1 usu&aacute;rio</li><li>Fichas b&aacute;sicas</li><li>Calculadora de doses</li><li>Agenda b&aacute;sica</li></ul>
+      <a href="#" onclick="return openM('cad')" class="pbtn">Come&ccedil;ar gr&aacute;tis</a>
+    </div>
+    <div class="plan hl">
+      <span class="pbadge">Mais popular</span>
+      <h3>Plano Profissional</h3>
+      <div class="prc"><sup style="font-size:.9rem;font-family:sans-serif">R$</sup>79<sub style="font-size:.85rem;font-family:sans-serif">/m&ecirc;s</sub></div>
+      <div class="pdc">Para MV e produtores em crescimento</div>
+      <ul><li>Animais ilimitados</li><li>At&eacute; 3 usu&aacute;rios</li><li>Fichas completas + hist&oacute;rico</li><li>Relat&oacute;rios PDF</li><li>Lembretes autom&aacute;ticos</li><li>Solicita&ccedil;&atilde;o de visitas</li></ul>
+      <a href="#" onclick="return openM('cad')" class="pbtn">Assinar plano</a>
+    </div>
+    <div class="plan">
+      <h3>Plano Empresarial</h3>
+      <div class="prc"><sup style="font-size:.9rem;font-family:sans-serif">R$</sup>199<sub style="font-size:.85rem;font-family:sans-serif">/m&ecirc;s</sub></div>
+      <div class="pdc">Para grandes opera&ccedil;&otilde;es e cl&iacute;nicas</div>
+      <ul><li>Tudo do Profissional</li><li>Usu&aacute;rios ilimitados</li><li>Multi-propriedades</li><li>Gest&atilde;o de equipe MV</li><li>API de integra&ccedil;&atilde;o</li><li>Suporte 24/7</li></ul>
+      <a href="#" onclick="return openM('cad')" class="pbtn">Falar com vendas</a>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta">
+  <h2>Transforme sua rotina veterin&aacute;ria hoje</h2>
+  <p>Comece gratuitamente. Sem cart&atilde;o de cr&eacute;dito.</p>
+  <div class="ctabs">
+    <a href="#" onclick="return openM('cad','mv')" class="ctaw">Sou M&eacute;dico Veterin&aacute;rio</a>
+    <a href="#" onclick="return openM('cad','prod')" class="ctao">Sou Produtor Rural</a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="fgrid">
+    <div class="fbl">
+      <div class="flogo">
+        <img src="logo.PNG" alt="VetPr&aacute;tica">
+        <div>
+          <span class="flogo-text">VetPr&aacute;tica</span>
+          <span class="flogo-sub">Assistente da rotina veterin&aacute;ria</span>
+        </div>
+      </div>
+      <p>Assistente digital da rotina veterin&aacute;ria. Focado em bovinos, equinos, ovinos, caprinos e su&iacute;nos.</p>
+    </div>
+    <div class="fcol"><h4>Plataforma</h4><ul>
+      <li><a href="#portais">Portal MV</a></li>
+      <li><a href="#portais">Portal Produtor</a></li>
+      <li><a href="#calc">Calculadora</a></li>
+      <li><a href="#planos">Planos</a></li>
+    </ul></div>
+    <div class="fcol"><h4>Recursos</h4><ul>
+      <li><a href="#">Ajuda</a></li>
+      <li><a href="#">Blog</a></li>
+      <li><a href="#">Documenta&ccedil;&atilde;o</a></li>
+      <li><a href="#">Sobre n&oacute;s</a></li>
+    </ul></div>
+    <div class="fcol"><h4>Empresa</h4><ul>
+      <li><a href="#">Contato</a></li>
+      <li><a href="#">Privacidade</a></li>
+      <li><a href="#">Termos de Uso</a></li>
+      <li><a href="#">LGPD</a></li>
+    </ul></div>
+  </div>
+  <div class="fbot">
+    <span>&copy; 2026 VetPr&aacute;tica. Todos os direitos reservados.</span>
+    <a href="#">Pol&iacute;tica de Privacidade</a>
+  </div>
+</footer>
+
+<button id="btt" onclick="scrollTo({top:0,behavior:'smooth'})">&uarr;</button>
+
+<!-- MODAL LOGIN / CADASTRO -->
+<div class="ov" id="ov" onclick="closeM(event)">
+  <div class="mdl">
+    <button class="mdlx" onclick="closeM2()">&times;</button>
+    <div class="mst on" id="s1">
+      <h2 id="mt">Acessar VetPr&aacute;tica</h2>
+      <p class="msub">Selecione seu perfil para continuar:</p>
+      <div class="rcs">
+        <div class="rc mv" id="rmv" onclick="selRole('mv')">
+          <div style="font-size:1.8rem">&#128104;</div>
+          <div><h4>M&eacute;dico Veterin&aacute;rio</h4><p>Fichas cl&iacute;nicas, agenda, calculadora e relat&oacute;rios.</p></div>
+        </div>
+        <div class="rc pr" id="rpr" onclick="selRole('prod')">
+          <div style="font-size:1.8rem">&#127806;</div>
+          <div><h4>Produtor Rural</h4><p>Rebanhos, sanit&aacute;rio, vacinas e manejos.</p></div>
+        </div>
+      </div>
+      <button class="btnnx" id="bnx" onclick="goS2()" disabled>Continuar &rarr;</button>
+    </div>
+    <div class="mst" id="s2">
+      <button class="mbk" onclick="goS1()">&larr; Voltar</button>
+      <h2 id="s2t">Entrar</h2>
+      <p class="msub" id="s2s">Acesse sua conta VetPr&aacute;tica</p>
+      <form onsubmit="doLogin(event)">
+        <div class="mg" id="fn" style="display:none"><label>Nome completo</label><input type="text" placeholder="Seu nome completo"></div>
+        <div class="mg" id="fc" style="display:none"><label>CRMV</label><input type="text" placeholder="CRMV-XX 00000"></div>
+        <div class="mg"><label>E-mail</label><input type="email" placeholder="seu@email.com" required></div>
+        <div class="mg"><label>Senha</label><input type="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" required></div>
+        <div class="mg" id="fsc" style="display:none"><label>Confirmar senha</label><input type="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"></div>
+        <button type="submit" class="btnsub" id="bsub">Entrar</button>
+      </form>
+      <div class="mdiv">ou</div>
+      <div class="mfl" id="mfl">N&atilde;o tem conta? <a href="#" onclick="swMode();return false">Cadastre-se gr&aacute;tis</a></div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.getElementById('hbg').onclick = function(){ document.getElementById('nl').classList.toggle('on'); };
+window.onscroll = function(){
+  document.getElementById('btt').classList.toggle('on', scrollY > 400);
+  document.getElementById('nav').style.boxShadow = scrollY > 8 ? '0 2px 14px rgba(0,0,0,.1)' : '';
+};
+
+var mode='log', role=null;
+
+function openM(m,r){
+  mode = m||'log';
+  document.getElementById('mt').textContent = m==='cad' ? 'Criar conta gratuita' : 'Acessar VetPr\u00e1tica';
+  document.getElementById('s1').classList.add('on');
+  document.getElementById('s2').classList.remove('on');
+  ['rmv','rpr'].forEach(function(id){ document.getElementById(id).classList.remove('sel'); });
+  role = null;
+  document.getElementById('bnx').disabled = true;
+  if(r){ selRole(r); goS2(); }
+  document.getElementById('ov').classList.add('on');
+  document.body.style.overflow = 'hidden';
+  return false;
+}
+function closeM(e){ if(e.target.id==='ov') closeM2(); }
+function closeM2(){ document.getElementById('ov').classList.remove('on'); document.body.style.overflow=''; }
+function selRole(r){
+  role=r;
+  ['rmv','rpr'].forEach(function(id){ document.getElementById(id).classList.remove('sel'); });
+  document.getElementById(r==='mv'?'rmv':'rpr').classList.add('sel');
+  document.getElementById('bnx').disabled=false;
+}
+function goS2(){ if(!role) return; document.getElementById('s1').classList.remove('on'); document.getElementById('s2').classList.add('on'); updS2(); }
+function goS1(){ document.getElementById('s2').classList.remove('on'); document.getElementById('s1').classList.add('on'); }
+function updS2(){
+  var isMV=role==='mv', isCad=mode==='cad';
+  document.getElementById('s2t').textContent = isCad ? 'Criar conta' : 'Entrar';
+  document.getElementById('s2s').textContent = (isCad?'Cadastro':'Acesso')+' como '+(isMV?'M\u00e9dico Veterin\u00e1rio':'Produtor Rural');
+  document.getElementById('fn').style.display  = isCad?'':'none';
+  document.getElementById('fc').style.display  = (isCad&&isMV)?'':'none';
+  document.getElementById('fsc').style.display = isCad?'':'none';
+  document.getElementById('bsub').textContent  = isCad?'Criar conta':'Entrar';
+  document.getElementById('mfl').innerHTML = isCad
+    ? 'J\u00e1 tem conta? <a href="#" onclick="swMode();return false">Entrar</a>'
+    : 'N\u00e3o tem conta? <a href="#" onclick="swMode();return false">Cadastre-se gr\u00e1tis</a>';
+}
+function swMode(){ mode=mode==='log'?'cad':'log'; updS2(); }
+function doLogin(e){
+  e.preventDefault(); closeM2();
+  window.location.href = role==='mv' ? 'mv_dashboard.html' : 'produtor_dashboard.html';
+}
+
+function calcDose(){
+  var p=parseFloat(document.getElementById('cp').value);
+  var d=parseFloat(document.getElementById('cd').value);
+  var c=parseFloat(document.getElementById('cc').value);
+  var v=document.getElementById('cv').value;
+  var esp=document.getElementById('ce').value;
+  if(!p||!d||!c){ alert('Preencha peso, dose e concentra\u00e7\u00e3o.'); return; }
+  var mg=p*d, ml=mg/c;
+  document.getElementById('crv').textContent = ml.toFixed(2)+' mL';
+  document.getElementById('crl').textContent = 'a administrar via '+v;
+  document.getElementById('crd').textContent = esp+' \u00b7 '+p+' kg \u00b7 Dose total: '+mg.toFixed(1)+' mg \u00b7 Conc: '+c+' mg/mL';
+  document.getElementById('cres').classList.add('on');
+}
+
+var io=new IntersectionObserver(function(en){
+  en.forEach(function(e){ if(e.isIntersecting){ e.target.style.opacity='1'; e.target.style.transform='translateY(0)'; } });
+},{threshold:0.07});
+document.querySelectorAll('.step,.f4c,.plan,.portal-card,.esp-card').forEach(function(el){
+  el.style.opacity='0'; el.style.transform='translateY(22px)';
+  el.style.transition='opacity .5s ease,transform .5s ease';
+  io.observe(el);
+});
+</script>
+</body>
+</html>

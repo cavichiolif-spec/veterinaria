@@ -1,0 +1,672 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VetPr&aacute;tica – Portal do Produtor Rural</title>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --a1:#8b6914;--a2:#a0845c;--a3:#c8a050;--as:#faf3e7;
+      --g1:#1a2e0d;--g2:#2d5a1b;--gs:#e8f2dc;
+      --t1:#4a7a2d;--ts:#e8f2dc;
+      --azul:#1565c0;--azuls:#e3f2fd;
+      --sidebar:#1a2e0d;--sbw:250px;
+      --bg:#f5f0e8;--tx:#2c2c2c;--txs:#5a5a5a;--wh:#fff;
+      --sh:0 2px 8px rgba(0,0,0,.07);--shm:0 4px 18px rgba(0,0,0,.11);
+      --r:10px;--tr:.2s ease;
+      --bege:#faf3e7;--bege2:#f0e8d5;--bege3:#c8b89a
+    }
+    body{font-family:'Segoe UI',system-ui,sans-serif;color:var(--tx);background:var(--bg)}
+    ::-webkit-scrollbar{width:6px}
+    ::-webkit-scrollbar-track{background:var(--bege)}
+    ::-webkit-scrollbar-thumb{background:var(--g2);border-radius:3px}
+    a{text-decoration:none;color:inherit}
+    .layout{display:flex;min-height:100vh}
+
+    /* SIDEBAR */
+    .sidebar{width:var(--sbw);background:var(--sidebar);color:#bbb;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;overflow-y:auto}
+    .sb-logo{padding:20px 18px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.07)}
+    .sb-li{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,var(--a3),var(--g2));display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+    .sb-nm{font-size:1rem;font-weight:800;color:white}
+    .sb-sub{font-size:.64rem;color:#888;font-weight:400}
+    .sb-nav{flex:1;padding:14px 0}
+    .sb-sec{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#555;padding:12px 18px 5px}
+    .ni{display:flex;align-items:center;gap:11px;padding:10px 18px;cursor:pointer;font-size:.87rem;color:#aaa;transition:background var(--tr),color var(--tr)}
+    .ni:hover{background:rgba(255,255,255,.05);color:white}
+    .ni.active{background:rgba(200,160,80,.2);color:white;border-right:3px solid var(--a3)}
+    .ni .ic{font-size:.95rem;width:18px;text-align:center;flex-shrink:0}
+    .nbadge{margin-left:auto;background:#e53935;color:white;font-size:.66rem;font-weight:700;padding:2px 7px;border-radius:50px}
+    .sb-user{padding:14px 18px;border-top:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:11px}
+    .av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--a2),var(--g2));color:white;font-weight:700;font-size:.88rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .ui strong{display:block;font-size:.83rem;color:white}
+    .ui span{font-size:.72rem;color:#888}
+
+    /* MAIN */
+    .main{margin-left:var(--sbw);flex:1;display:flex;flex-direction:column}
+    .topbar{background:white;padding:13px 26px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 0 #e8e8e8;position:sticky;top:0;z-index:50}
+    .tb-l .tbt{font-size:1rem;font-weight:700}
+    .tb-l .tbs{font-size:.78rem;color:var(--txs)}
+    .tb-r{display:flex;align-items:center;gap:12px}
+    .tbtn{background:none;border:1.5px solid #ddd;border-radius:8px;padding:7px 13px;font-size:.82rem;cursor:pointer;display:flex;align-items:center;gap:6px;transition:border-color var(--tr),color var(--tr);font-family:inherit}
+    .tbtn:hover{border-color:var(--a2);color:var(--a1)}
+    .tbtn.pri{background:var(--g2);color:white;border-color:var(--g2)}
+    .tbtn.pri:hover{background:var(--g1);border-color:var(--g1)}
+    .bell{position:relative;cursor:pointer;font-size:1.1rem}
+    .bdot{position:absolute;top:-2px;right:-2px;width:8px;height:8px;background:#e53935;border-radius:50%;border:2px solid white}
+    .content{padding:24px;flex:1}
+
+    /* PANELS */
+    .panel{display:none}
+    .panel.active{display:block}
+
+    /* CARDS */
+    .sc-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;margin-bottom:24px}
+    .sc{background:white;border-radius:var(--r);padding:18px;box-shadow:var(--sh);display:flex;align-items:center;gap:12px}
+    .sc-ic{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+    .sc-num{font-size:1.6rem;font-weight:800;line-height:1}
+    .sc-lbl{font-size:.74rem;color:var(--txs);margin-top:2px}
+
+    .card{background:white;border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;margin-bottom:20px;border:1px solid var(--bege2)}
+    .ch{padding:16px 20px;border-bottom:1px solid var(--bege2);display:flex;align-items:center;justify-content:space-between;background:var(--bege)}
+    .ch h3{font-size:.93rem;font-weight:700}
+    .cb{padding:0}
+    .cbp{padding:20px}
+
+    /* TABLE */
+    table{width:100%;border-collapse:collapse}
+    th{font-size:.74rem;text-transform:uppercase;letter-spacing:.8px;color:var(--txs);font-weight:700;padding:9px 14px;background:#fafafa;text-align:left;border-bottom:1px solid #f0f0f0}
+    td{padding:11px 14px;font-size:.86rem;border-bottom:1px solid #f9f9f9;vertical-align:middle}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:#fafafa}
+    .bdg{display:inline-block;padding:3px 9px;border-radius:50px;font-size:.7rem;font-weight:700}
+    .ok{background:var(--gs);color:var(--g2)}
+    .al{background:#fff3e0;color:#e65100}
+    .urg{background:#fce4ec;color:#c62828}
+    .inf{background:var(--azuls);color:var(--azul)}
+    .teal{background:var(--ts);color:var(--t1)}
+    .pend{background:#f3e5f5;color:#7b1fa2}
+
+    /* SEARCH */
+    .srch{display:flex;gap:10px;align-items:center;margin-bottom:18px;flex-wrap:wrap}
+    .si2{flex:1 1 200px;padding:9px 13px;border:1.5px solid #e0e0e0;border-radius:8px;font-size:.88rem;font-family:inherit}
+    .si2:focus{outline:none;border-color:var(--a3)}
+    .sel2{padding:9px 12px;border:1.5px solid #e0e0e0;border-radius:8px;font-size:.88rem;font-family:inherit;background:white}
+    .bsm{padding:9px 16px;border-radius:8px;font-size:.83rem;font-weight:600;cursor:pointer;border:none;transition:background var(--tr);font-family:inherit}
+    .bsm.amber{background:var(--g2);color:white}
+    .bsm.amber:hover{background:var(--g1)}
+    .bsm.out{background:none;border:1.5px solid #ddd;color:var(--txs)}
+    .bsm.out:hover{border-color:var(--a2);color:var(--a2)}
+    .bsm.green{background:var(--g2);color:white}
+    .bsm.green:hover{background:var(--g1)}
+
+    /* FORM */
+    .fg{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
+    .fgr{display:flex;flex-direction:column;gap:5px}
+    .fgr.full{grid-column:1/-1}
+    .fgr label{font-size:.79rem;font-weight:600;color:var(--txs)}
+    .fgr input,.fgr select,.fgr textarea{padding:9px 12px;border:1.5px solid #e0e0e0;border-radius:8px;font-size:.88rem;font-family:inherit;transition:border-color var(--tr)}
+    .fgr input:focus,.fgr select:focus,.fgr textarea:focus{outline:none;border-color:var(--a3);box-shadow:0 0 0 3px rgba(230,74,25,.08)}
+    .fgr textarea{resize:vertical}
+    .fax{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+    .bsv{background:var(--g2);color:white;border:none;padding:10px 26px;border-radius:8px;font-size:.88rem;font-weight:700;cursor:pointer;transition:background var(--tr);font-family:inherit}
+    .bsv:hover{background:var(--g1)}
+    .bcn{background:none;border:1.5px solid #ddd;color:var(--txs);padding:9px 22px;border-radius:8px;font-size:.88rem;cursor:pointer;font-family:inherit}
+
+    /* LOTE CARDS */
+    .lote-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+    .lote-card{background:white;border-radius:var(--r);padding:20px;box-shadow:var(--sh);border-left:4px solid var(--g2);transition:transform var(--tr)}
+    .lote-card:hover{transform:translateY(-3px)}
+    .lote-card h4{font-size:.93rem;font-weight:700;margin-bottom:4px}
+    .lote-spec{font-size:.78rem;color:var(--txs);margin-bottom:10px}
+    .lote-num{font-size:1.4rem;font-weight:800;color:var(--a2)}
+    .lote-lbl{font-size:.72rem;color:var(--txs)}
+
+    /* TIMELINE */
+    .timeline{display:flex;flex-direction:column;gap:0}
+    .tl-item{display:flex;gap:14px;position:relative;padding-bottom:20px}
+    .tl-item:last-child{padding-bottom:0}
+    .tl-item:not(:last-child)::after{content:'';position:absolute;left:15px;top:30px;bottom:0;width:2px;background:#e8e8e8}
+    .tl-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;z-index:1;border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,.1)}
+    .tl-content{flex:1;background:var(--bg);border-radius:8px;padding:12px 14px}
+    .tl-date{font-size:.74rem;color:var(--txs);margin-bottom:3px}
+    .tl-title{font-size:.9rem;font-weight:700;margin-bottom:3px}
+    .tl-desc{font-size:.82rem;color:var(--txs)}
+
+    /* REMINDER CARDS */
+    .rem-list{display:flex;flex-direction:column;gap:10px}
+    .rem-item{background:white;border-radius:8px;padding:14px 16px;box-shadow:var(--sh);display:flex;align-items:center;gap:12px}
+    .rem-color{width:4px;height:40px;border-radius:4px;flex-shrink:0}
+    .rem-info{flex:1}
+    .rem-title{font-size:.9rem;font-weight:600}
+    .rem-sub{font-size:.78rem;color:var(--txs)}
+    .rem-badge{margin-left:auto}
+
+    /* VISIT REQUEST */
+    .visit-form{background:white;border-radius:var(--r);padding:28px;box-shadow:var(--sh);max-width:680px;border:1px solid var(--bege2)}
+    .visit-form h3{font-size:1rem;font-weight:800;color:var(--a2);margin-bottom:20px}
+
+    /* VET LIST */
+    .vet-list{display:flex;flex-direction:column;gap:10px;margin-top:20px}
+    .vet-card{background:var(--bg);border-radius:8px;padding:13px 16px;display:flex;align-items:center;gap:13px}
+    .vet-av{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--t1),var(--g2));color:white;font-weight:700;font-size:.9rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .vet-info{flex:1}
+    .vet-info strong{display:block;font-size:.9rem}
+    .vet-info span{font-size:.78rem;color:var(--txs)}
+    .vet-km{font-size:.75rem;font-weight:700;background:var(--gs);color:var(--g2);padding:4px 10px;border-radius:50px}
+
+    /* MANEJO TABLE */
+    .manejo-cat{font-size:.82rem;font-weight:700;color:var(--txs);text-transform:uppercase;letter-spacing:.8px;margin:18px 0 10px;border-bottom:1px solid #eee;padding-bottom:6px}
+
+    /* MODAL */
+    .movo{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;padding:16px}
+    .movo.on{opacity:1;pointer-events:all}
+    .modb{background:white;border-radius:14px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;padding:28px;box-shadow:0 16px 48px rgba(0,0,0,.25);transform:translateY(14px);transition:transform .25s}
+    .movo.on .modb{transform:translateY(0)}
+    .modb h3{font-size:1.05rem;font-weight:700;margin-bottom:18px;color:var(--a2)}
+    .modb-x{float:right;background:none;border:none;font-size:1.2rem;cursor:pointer;color:#aaa;margin-top:-4px}
+
+    /* TOAST */
+    .toast{position:fixed;bottom:20px;right:20px;background:var(--g2);color:white;padding:12px 20px;border-radius:10px;font-size:.88rem;font-weight:600;box-shadow:var(--shm);transform:translateX(200%);transition:transform .4s;z-index:9999}
+    .toast.on{transform:translateX(0)}
+
+    @media(max-width:900px){.sidebar{width:58px}.sb-nm,.sb-sub,.ni span:not(.ic),.nbadge,.ui{display:none}.main{margin-left:58px}.ni{justify-content:center;padding:12px}}
+    @media(max-width:600px){.sc-row{grid-template-columns:1fr 1fr}.tb-r .tbtn:not(.pri){display:none}}
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <a href="index.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;padding:4px 0">
+        <img src="logo.PNG" alt="VetPratica" style="width:36px;height:36px;object-fit:contain;border-radius:6px;flex-shrink:0">
+        <div><div class="sb-nm">VetPr&aacute;tica</div><div class="sb-sub">Portal do Produtor</div></div>
+      </a>
+    </div>
+      </a>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-sec">Principal</div>
+      <div class="ni active" onclick="show('dashboard',this)"><span class="ic">🝠</span><span>Dashboard</span></div>
+      <div class="ni" onclick="show('animais',this)"><span class="ic">🝄</span><span>Meus Animais</span><span class="nbadge">284</span></div>
+      <div class="ni" onclick="show('rebanhos',this)"><span class="ic">🝂</span><span>Rebanhos / Lotes</span></div>
+      <div class="sb-sec">Gestão Sanitária</div>
+      <div class="ni" onclick="show('historico',this)"><span class="ic">📋</span><span>Histórico Sanitário</span></div>
+      <div class="ni" onclick="show('vacinas',this)"><span class="ic">💉</span><span>Vacinas e Tratamentos</span></div>
+      <div class="ni" onclick="show('manejos',this)"><span class="ic">🔧</span><span>Controle de Manejos</span></div>
+      <div class="sb-sec">Comunicação</div>
+      <div class="ni" onclick="show('visita',this)"><span class="ic">📝</span><span>Solicitar Visita MV</span></div>
+      <div class="ni" onclick="show('lembretes',this)"><span class="ic">🔔</span><span>Lembretes</span><span class="nbadge">2</span></div>
+      <div class="sb-sec">Conta</div>
+      <div class="ni" onclick="show('config',this)"><span class="ic">⚙︝</span><span>Configurações</span></div>
+      <div class="ni" onclick="if(confirm('Sair da conta?'))window.location.href='index.html'"><span class="ic">🚪</span><span>Sair</span></div>
+    </nav>
+    <div class="sb-user">
+      <div class="av">JS</div>
+      <div class="ui"><strong>João Silva</strong><span>Produtor Rural</span></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div class="tb-l"><div class="tbt" id="pagetitle">Dashboard</div><div class="tbs" id="pagesub">Bem-vindo, João! Você tem 2 alertas pendentes.</div></div>
+      <div class="tb-r">
+        <div class="bell" title="Alertas">🔔<div class="bdot"></div></div>
+        <button class="tbtn out" onclick="show('visita')">📝 Solicitar visita MV</button>
+        <button class="tbtn pri" onclick="show('animais');document.getElementById('form-animal').style.display='block'">+ Novo Animal</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ╝╝ DASHBOARD ╝╝ -->
+      <div class="panel active" id="p-dashboard">
+        <div class="sc-row">
+          <div class="sc"><div class="sc-ic" style="background:var(--as)">🝄</div><div><div class="sc-num" style="color:var(--a2)">284</div><div class="sc-lbl">Total de animais</div></div></div>
+          <div class="sc"><div class="sc-ic" style="background:var(--gs)">🝂</div><div><div class="sc-num" style="color:var(--g2)">7</div><div class="sc-lbl">Lotes ativos</div></div></div>
+          <div class="sc"><div class="sc-ic" style="background:#fff3e0">💉</div><div><div class="sc-num" style="color:#e65100">15/Nov</div><div class="sc-lbl">Próxima vacinação</div></div></div>
+          <div class="sc"><div class="sc-ic" style="background:#fce4ec">🔔</div><div><div class="sc-num" style="color:#e53935">2</div><div class="sc-lbl">Alertas ativos</div></div></div>
+          <div class="sc"><div class="sc-ic" style="background:var(--azuls)">📋</div><div><div class="sc-num" style="color:var(--azul)">18</div><div class="sc-lbl">Manejos este mês</div></div></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:20px">
+          <!-- Lembretes -->
+          <div class="card">
+            <div class="ch"><h3>❰ Lembretes e Alertas</h3><button class="bsm out" onclick="show('lembretes')">Ver todos →</button></div>
+            <div class="cbp">
+              <div class="rem-list">
+                <div class="rem-item"><div class="rem-color" style="background:#f44336"></div><div class="rem-info"><div class="rem-title">🝄 Lote A – Vacinação aftosa</div><div class="rem-sub">Vence em 5 dias · 48 bovinos</div></div><span class="bdg urg rem-badge">Urgente</span></div>
+                <div class="rem-item"><div class="rem-color" style="background:#ff9800"></div><div class="rem-info"><div class="rem-title">🝄 Matriz #018 – Diag. gestação</div><div class="rem-sub">Diagnóstico pendente · 30 dias após cobertura</div></div><span class="bdg al rem-badge">Pendente</span></div>
+                <div class="rem-item"><div class="rem-color" style="background:#4caf50"></div><div class="rem-info"><div class="rem-title">🝑 Lote B – Vermifugação</div><div class="rem-sub">Concluída em 15/10/2026</div></div><span class="bdg ok rem-badge">Feito</span></div>
+                <div class="rem-item"><div class="rem-color" style="background:#2196f3"></div><div class="rem-info"><div class="rem-title">🝴 Equino #201 – Retorno MV</div><div class="rem-sub">Agendado para 25/10/2026</div></div><span class="bdg inf rem-badge">Agendado</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Histórico recente -->
+          <div class="card">
+            <div class="ch"><h3>📋 Últimos Registros Sanitários</h3><button class="bsm out" onclick="show('historico')">Ver histórico →</button></div>
+            <div class="cb">
+              <table>
+                <thead><tr><th>Data</th><th>Animal / Lote</th><th>Tipo</th><th>Responsável</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr><td>20/10/2026</td><td>Bovino #042</td><td>Consulta</td><td>Dra. Ana</td><td><span class="bdg ok">Concluído</span></td></tr>
+                  <tr><td>15/10/2026</td><td>Lote B · 30 ovinos</td><td>Vermifugação</td><td>Produtor</td><td><span class="bdg ok">Concluído</span></td></tr>
+                  <tr><td>12/10/2026</td><td>Equino #007</td><td>Tratamento</td><td>Dra. Ana</td><td><span class="bdg al">Em andamento</span></td></tr>
+                  <tr><td>08/10/2026</td><td>Suíno #028</td><td>Vacinação</td><td>Dr. Carlos</td><td><span class="bdg ok">Concluído</span></td></tr>
+                  <tr><td>01/10/2026</td><td>Matriz #018</td><td>Cobertura</td><td>Produtor</td><td><span class="bdg pend">Aguardando DG</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ╝╝ MEUS ANIMAIS ╝╝ -->
+      <div class="panel" id="p-animais">
+        <div class="srch">
+          <input class="si2" type="text" placeholder="🔝  Buscar por nome, número, espécie...">
+          <select class="sel2"><option>Todas as espécies</option><option>Bovino</option><option>Equino</option><option>Ovino</option><option>Caprino</option><option>Suíno</option></select>
+          <select class="sel2"><option>Todos os lotes</option><option>Lote A</option><option>Lote B</option><option>Lote C</option><option>Plantel</option></select>
+          <button class="bsm amber" onclick="document.getElementById('form-animal').style.display=document.getElementById('form-animal').style.display==='none'?'block':'none'">+ Novo Animal</button>
+          <button class="bsm out">⬇ Exportar</button>
+        </div>
+
+        <!-- Formulário -->
+        <div id="form-animal" class="card" style="display:none;margin-bottom:20px">
+          <div class="ch"><h3>🝄 Cadastrar Novo Animal</h3><button class="bsm out" onclick="document.getElementById('form-animal').style.display='none'">Cancelar</button></div>
+          <div class="cbp">
+            <div class="fg">
+              <div class="fgr"><label>Espécie</label><select><option>Bovino</option><option>Equino</option><option>Ovino</option><option>Caprino</option><option>Suíno</option></select></div>
+              <div class="fgr"><label>Raça</label><input type="text" placeholder="Ex: Nelore, Quarto de Milha..."></div>
+              <div class="fgr"><label>Identificação / Número</label><input type="text" placeholder="Ex: #042 ou brinco 1234"></div>
+              <div class="fgr"><label>Nome / Apelido</label><input type="text" placeholder="Ex: Estrela (opcional)"></div>
+              <div class="fgr"><label>Sexo</label><select><option>Fêmea</option><option>Macho</option></select></div>
+              <div class="fgr"><label>Data de nascimento</label><input type="date"></div>
+              <div class="fgr"><label>Peso atual (kg)</label><input type="number" placeholder="Ex: 480"></div>
+              <div class="fgr"><label>Lote / Grupo</label><select><option>Lote A – Bovinos</option><option>Lote B – Ovinos</option><option>Lote C – Caprinos</option><option>Plantel de Equinos</option><option>Granja – Suínos</option><option>Novo lote...</option></select></div>
+              <div class="fgr"><label>Finalidade</label><select><option>Corte</option><option>Leite</option><option>Reprodução</option><option>Trabalho</option><option>Esporte</option><option>Misto</option></select></div>
+              <div class="fgr"><label>Origem</label><select><option>Nascido na propriedade</option><option>Comprado</option><option>Transferido</option></select></div>
+              <div class="fgr full"><label>Observações</label><textarea rows="2" placeholder="Características especiais, histórico anterior..."></textarea></div>
+            </div>
+            <div class="fax"><button class="bsv" onclick="document.getElementById('form-animal').style.display='none';toast('Animal cadastrado com sucesso!')">💾 Cadastrar Animal</button><button class="bcn" onclick="document.getElementById('form-animal').style.display='none'">Cancelar</button></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="ch"><h3>🝄 Lista de Animais (284)</h3></div>
+          <div class="cb">
+            <table>
+              <thead><tr><th>ID / Nome</th><th>Espécie / Raça</th><th>Sexo</th><th>Lote</th><th>Peso</th><th>Nascimento</th><th>Finalidade</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td><strong>#042</strong> – Estrela</td><td>Bovino · Nelore</td><td>Fêmea</td><td>Lote A</td><td>485 kg</td><td>05/03/2022</td><td>Corte</td><td><span class="bdg ok">Saudável</span></td></tr>
+                <tr><td><strong>#007</strong> – Trovão</td><td>Equino · QM</td><td>Macho</td><td>Plantel</td><td>520 kg</td><td>12/07/2019</td><td>Trabalho</td><td><span class="bdg al">Tratamento</span></td></tr>
+                <tr><td><strong>#018</strong> – Lua</td><td>Bovino · Nelore</td><td>Fêmea</td><td>Lote A</td><td>440 kg</td><td>18/11/2021</td><td>Reprodução</td><td><span class="bdg pend">Aguard. DG</span></td></tr>
+                <tr><td><strong>#115</strong> – Mel</td><td>Caprino · Boer</td><td>Fêmea</td><td>Lote C</td><td>42 kg</td><td>22/01/2024</td><td>Corte</td><td><span class="bdg ok">Saudável</span></td></tr>
+                <tr><td><strong>#089</strong> – Pingo</td><td>Ovino · Santa Inês</td><td>Macho</td><td>Lote B</td><td>58 kg</td><td>14/05/2023</td><td>Corte</td><td><span class="bdg inf">Pós-op</span></td></tr>
+                <tr><td><strong>#028</strong></td><td>Suíno · Landrace</td><td>Macho</td><td>Granja</td><td>110 kg</td><td>03/04/2025</td><td>Corte</td><td><span class="bdg ok">Saudável</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ╝╝ REBANHOS / LOTES ╝╝ -->
+      <div class="panel" id="p-rebanhos">
+        <div class="srch">
+          <input class="si2" type="text" placeholder="🔝  Buscar lote...">
+          <button class="bsm amber" onclick="abrirModal('m-lote')">+ Novo Lote</button>
+        </div>
+        <div class="lote-grid">
+          <div class="lote-card"><h4>🝄 Lote A – Bovinos de Corte</h4><div class="lote-spec">Bovino · Nelore · Pastagem 1</div><div class="lote-num">48</div><div class="lote-lbl">animais · Vacinação: 15/Nov ⚠︝</div></div>
+          <div class="lote-card" style="border-left-color:#4caf50"><h4>🝑 Lote B – Ovinos</h4><div class="lote-spec">Ovino · Santa Inês · Pastagem 2</div><div class="lote-num">30</div><div class="lote-lbl">animais · Vermifugado em 15/Out ✅</div></div>
+          <div class="lote-card" style="border-left-color:#9c27b0"><h4>🝝 Lote C – Caprinos</h4><div class="lote-spec">Caprino · Boer · Pastagem 3</div><div class="lote-num">25</div><div class="lote-lbl">animais · Vacinação: 20/Nov</div></div>
+          <div class="lote-card" style="border-left-color:#ff9800"><h4>🝴 Plantel – Equinos</h4><div class="lote-spec">Equino · Mangalarga + QM · Estábulo</div><div class="lote-num">8</div><div class="lote-lbl">animais · Retorno MV: 25/Out</div></div>
+          <div class="lote-card" style="border-left-color:#f44336"><h4>🝷 Granja – Suínos</h4><div class="lote-spec">Suíno · Landrace · Pocilga A+B</div><div class="lote-num">173</div><div class="lote-lbl">animais · Vacinação: Ok</div></div>
+          <div class="lote-card" style="border-left-color:#2196f3"><h4>🝄 Matrizes Nelore</h4><div class="lote-spec">Bovino · Nelore · Ýrea reprodutiva</div><div class="lote-num">18</div><div class="lote-lbl">matrizes · 5 diagnósticos pendentes</div></div>
+        </div>
+      </div>
+
+      <!-- ╝╝ HISTÓRICO SANITÝRIO ╝╝ -->
+      <div class="panel" id="p-historico">
+        <div class="srch">
+          <input class="si2" type="text" placeholder="🔝  Filtrar por animal, tipo ou data...">
+          <select class="sel2"><option>Todos os tipos</option><option>Vacinação</option><option>Tratamento</option><option>Cobertura</option><option>Parto</option><option>Cirurgia</option><option>Exame</option></select>
+          <button class="bsm amber" onclick="abrirModal('m-hist')">+ Novo Registro</button>
+          <button class="bsm out">⬇ Exportar</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+          <!-- Timeline sanitária -->
+          <div class="card">
+            <div class="ch"><h3>📋 Timeline Sanitária</h3></div>
+            <div class="cbp">
+              <div class="timeline">
+                <div class="tl-item"><div class="tl-dot" style="background:#4caf50">💉</div><div class="tl-content"><div class="tl-date">20/10/2026 · Dra. Ana Fernandes</div><div class="tl-title">Bovino #042 – Retorno pós-cirurgia</div><div class="tl-desc">Animal se recuperando bem. Retirada de pontos em 7 dias.</div></div></div>
+                <div class="tl-item"><div class="tl-dot" style="background:#4caf50">✅</div><div class="tl-content"><div class="tl-date">15/10/2026 · Produtor</div><div class="tl-title">Lote B – Vermifugação (30 ovinos)</div><div class="tl-desc">Ivermectina 1% · 0,2 mL/kg SC. Próxima: 15/Jan/2027.</div></div></div>
+                <div class="tl-item"><div class="tl-dot" style="background:#2196f3">🔬</div><div class="tl-content"><div class="tl-date">12/10/2026 · Dra. Ana Fernandes</div><div class="tl-title">Equino #007 – Exame locomotor</div><div class="tl-desc">Claudicação grau II. Tratamento com AINEs por 10 dias.</div></div></div>
+                <div class="tl-item"><div class="tl-dot" style="background:#e91e63">🝄</div><div class="tl-content"><div class="tl-date">01/10/2026 · Produtor</div><div class="tl-title">Matriz #018 – Cobertura natural</div><div class="tl-desc">Touro Brahman. DG previsto para 01/Nov/2026.</div></div></div>
+                <div class="tl-item"><div class="tl-dot" style="background:#ff9800">💉</div><div class="tl-content"><div class="tl-date">25/09/2026 · Dr. Carlos Mendes</div><div class="tl-title">Lote A – Vacinação brucelose</div><div class="tl-desc">48 bovinos vacinados. Próxima aftosa: 15/Nov/2026.</div></div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Histórico reprodutivo -->
+          <div class="card">
+            <div class="ch"><h3>🝄 Histórico Reprodutivo</h3><button class="bsm out" onclick="abrirModal('m-repro')">+ Registrar</button></div>
+            <div class="cb">
+              <table>
+                <thead><tr><th>Animal</th><th>Evento</th><th>Data</th><th>Resultado</th></tr></thead>
+                <tbody>
+                  <tr><td><strong>#018</strong> – Lua</td><td>Cobertura</td><td>01/10/2026</td><td><span class="bdg pend">DG Pendente</span></td></tr>
+                  <tr><td><strong>#022</strong> – Rosa</td><td>Parto</td><td>10/09/2026</td><td><span class="bdg ok">Bezerro vivo</span></td></tr>
+                  <tr><td><strong>#031</strong> – Fada</td><td>Cobertura IA</td><td>05/09/2026</td><td><span class="bdg ok">Gestante</span></td></tr>
+                  <tr><td><strong>#015</strong> – Serra</td><td>IATF</td><td>22/08/2026</td><td><span class="bdg urg">Vazia</span></td></tr>
+                  <tr><td><strong>#044</strong> – Branca</td><td>Parto</td><td>14/07/2026</td><td><span class="bdg ok">Gêmeos</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ╝╝ VACINAS E TRATAMENTOS ╝╝ -->
+      <div class="panel" id="p-vacinas">
+        <div class="srch">
+          <input class="si2" type="text" placeholder="🔝  Buscar vacina, medicamento ou animal...">
+          <select class="sel2"><option>Todos</option><option>Vacinação</option><option>Tratamento</option><option>Vermifugação</option><option>Carrapaticida</option></select>
+          <button class="bsm amber" onclick="abrirModal('m-vac')">+ Novo Registro</button>
+        </div>
+        <div class="card">
+          <div class="ch"><h3>💉 Vacinas e Tratamentos Aplicados</h3></div>
+          <div class="cb">
+            <table>
+              <thead><tr><th>Data</th><th>Animal / Lote</th><th>Tipo</th><th>Produto</th><th>Dose</th><th>Via</th><th>Próxima dose</th><th>Responsável</th></tr></thead>
+              <tbody>
+                <tr><td>25/09/2026</td><td>Lote A · 48 bovinos</td><td><span class="bdg inf">Vacinação</span></td><td>Aftovax</td><td>2 mL/animal</td><td>SC</td><td>25/03/2027</td><td>Dr. Carlos</td></tr>
+                <tr><td>15/10/2026</td><td>Lote B · 30 ovinos</td><td><span class="bdg teal">Vermifugação</span></td><td>Ivermectina 1%</td><td>0,2 mL/kg</td><td>SC</td><td>15/01/2027</td><td>Produtor</td></tr>
+                <tr><td>12/10/2026</td><td>#007 – Trovão</td><td><span class="bdg al">Tratamento</span></td><td>Meloxicam 2%</td><td>0,6 mg/kg</td><td>IV</td><td>—</td><td>Dra. Ana</td></tr>
+                <tr><td>08/10/2026</td><td>Granja · 173 suínos</td><td><span class="bdg inf">Vacinação</span></td><td>Circovac</td><td>2 mL</td><td>IM</td><td>08/10/2027</td><td>Dr. Carlos</td></tr>
+                <tr><td>20/09/2026</td><td>Lote A · 48 bovinos</td><td><span class="bdg ok">Carrapaticida</span></td><td>Amitraz 12,5%</td><td>2 mL/L</td><td>Banho</td><td>20/11/2026</td><td>Produtor</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ╝╝ CONTROLE DE MANEJOS ╝╝ -->
+      <div class="panel" id="p-manejos">
+        <div class="srch">
+          <input class="si2" type="text" placeholder="🔝  Buscar manejo...">
+          <button class="bsm amber" onclick="abrirModal('m-man')">+ Registrar Manejo</button>
+          <button class="bsm out">⬇ Exportar</button>
+        </div>
+        <div class="card">
+          <div class="cbp">
+            <div class="manejo-cat">🔬 Sanitário</div>
+            <div class="rem-list" style="margin-bottom:16px">
+              <div class="rem-item"><div class="rem-color" style="background:#f44336"></div><div class="rem-info"><div class="rem-title">Vacinação aftosa – Lote A (48 bovinos)</div><div class="rem-sub">Prevista: 15/Nov/2026</div></div><span class="bdg urg">Pendente</span></div>
+              <div class="rem-item"><div class="rem-color" style="background:#ff9800"></div><div class="rem-info"><div class="rem-title">Carrapaticida – Lote A</div><div class="rem-sub">Previsto: 20/Nov/2026</div></div><span class="bdg al">Próximo</span></div>
+              <div class="rem-item"><div class="rem-color" style="background:#4caf50"></div><div class="rem-info"><div class="rem-title">Vermifugação – Lote B (30 ovinos)</div><div class="rem-sub">Realizado: 15/Out/2026</div></div><span class="bdg ok">Concluído</span></div>
+            </div>
+            <div class="manejo-cat">🝄 Reprodutivo</div>
+            <div class="rem-list" style="margin-bottom:16px">
+              <div class="rem-item"><div class="rem-color" style="background:#9c27b0"></div><div class="rem-info"><div class="rem-title">Diagnóstico de gestação – #018 Lua</div><div class="rem-sub">Previsto: 01/Nov/2026 · 30 dias pós-cobertura</div></div><span class="bdg pend">Pendente</span></div>
+              <div class="rem-item"><div class="rem-color" style="background:#4caf50"></div><div class="rem-info"><div class="rem-title">Desmame – Bezerro da #022 Rosa</div><div class="rem-sub">Previsto: 10/Jan/2027 · 90 dias de vida</div></div><span class="bdg inf">Programado</span></div>
+            </div>
+            <div class="manejo-cat">🌾 Nutricional / Outros</div>
+            <div class="rem-list">
+              <div class="rem-item"><div class="rem-color" style="background:#2196f3"></div><div class="rem-info"><div class="rem-title">Pesagem geral – Lote A</div><div class="rem-sub">Trimestral · Próxima: 01/Dez/2026</div></div><span class="bdg inf">Programado</span></div>
+              <div class="rem-item"><div class="rem-color" style="background:#4caf50"></div><div class="rem-info"><div class="rem-title">Mineralização – Todos os lotes</div><div class="rem-sub">Reposição realizada em 10/Out/2026</div></div><span class="bdg ok">Em dia</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ╝╝ SOLICITAR VISITA MV ╝╝ -->
+      <div class="panel" id="p-visita">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;flex-wrap:wrap">
+          <div>
+            <div class="visit-form">
+              <h3>📝 Solicitar Visita do Médico Veterinário</h3>
+              <div class="fg">
+                <div class="fgr full"><label>MV responsável</label><select><option>Dra. Ana Fernandes (CRMV-SP 12345)</option><option>Dr. Carlos Mendes (CRMV-SP 23456)</option><option>Buscar outro MV...</option></select></div>
+                <div class="fgr"><label>Data preferencial</label><input type="date" value="2026-10-25"></div>
+                <div class="fgr"><label>Horário preferencial</label><input type="time" value="09:00"></div>
+                <div class="fgr"><label>Urgência</label><select><option>Baixa – Rotina</option><option>Média – Precisa atenção</option><option>Alta – Urgente</option><option>Emergência – Crítico</option></select></div>
+                <div class="fgr full"><label>Espécie / Animal afetado</label><input type="text" placeholder="Ex: Bovino #042 ou Lote A – 48 bovinos"></div>
+                <div class="fgr full"><label>Motivo da visita</label><textarea rows="3" placeholder="Descreva o motivo da visita, sinais observados, comportamento anormal..."></textarea></div>
+                <div class="fgr full"><label>Materiais / exames necessários</label><textarea rows="2" placeholder="Informe se há necessidade de materiais especiais ou exames"></textarea></div>
+              </div>
+              <div class="fax"><button class="bsv" onclick="toast('Solicitação enviada ao MV! Aguarde confirmação.')">📤 Enviar Solicitação</button></div>
+            </div>
+
+            <!-- Histórico de solicitações -->
+            <div class="card" style="margin-top:20px">
+              <div class="ch"><h3>📜 Histórico de Visitas</h3></div>
+              <div class="cb">
+                <table>
+                  <thead><tr><th>Data</th><th>MV</th><th>Motivo</th><th>Status</th></tr></thead>
+                  <tbody>
+                    <tr><td>20/10/2026</td><td>Dra. Ana</td><td>Retorno Bov. #042</td><td><span class="bdg ok">Realizada</span></td></tr>
+                    <tr><td>12/10/2026</td><td>Dra. Ana</td><td>Exame Equino #007</td><td><span class="bdg ok">Realizada</span></td></tr>
+                    <tr><td>25/09/2026</td><td>Dr. Carlos</td><td>Vacinação Lote A</td><td><span class="bdg ok">Realizada</span></td></tr>
+                    <tr><td>10/09/2026</td><td>Dra. Ana</td><td>Cirurgia Bov. #042</td><td><span class="bdg ok">Realizada</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Buscar MV disponível -->
+          <div class="card">
+            <div class="ch"><h3>🔝 Meus Veterinários</h3><button class="bsm out" onclick="abrirModal('m-buscamv')">Buscar outro MV</button></div>
+            <div class="cbp">
+              <div class="vet-list">
+                <div class="vet-card"><div class="vet-av">AF</div><div class="vet-info"><strong>Dra. Ana Fernandes</strong><span>Bovinos · Equinos · CRMV-SP 12345</span></div><span class="vet-km" style="background:var(--gs);color:var(--g2)">⭝ Seu MV</span></div>
+                <div class="vet-card"><div class="vet-av">CM</div><div class="vet-info"><strong>Dr. Carlos Mendes</strong><span>Cirurgia · Bovinos · CRMV-SP 23456</span></div><span class="vet-km">📝 15 km</span></div>
+                <div class="vet-card"><div class="vet-av">JL</div><div class="vet-info"><strong>Dr. Jorge Lima</strong><span>Reprodução · Bovinos · CRMV-SP 44100</span></div><span class="vet-km">📝 32 km</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ╝╝ LEMBRETES ╝╝ -->
+      <div class="panel" id="p-lembretes">
+        <div class="srch">
+          <select class="sel2"><option>Todos os lembretes</option><option>Sanitário</option><option>Reprodutivo</option><option>Nutricional</option><option>Visita MV</option></select>
+          <button class="bsm amber" onclick="abrirModal('m-lem')">+ Novo Lembrete</button>
+        </div>
+
+        <div class="card">
+          <div class="ch"><h3>🔴 Urgentes / Atrasados</h3></div>
+          <div class="cbp">
+            <div class="rem-list">
+              <div class="rem-item"><div class="rem-color" style="background:#f44336"></div><div class="rem-info"><div class="rem-title">🝄 Vacinação aftosa – Lote A (48 bovinos)</div><div class="rem-sub">Vence em 15/Nov/2026 · Faltam 26 dias</div></div><span class="bdg urg">⚠︝ Próximo</span></div>
+              <div class="rem-item"><div class="rem-color" style="background:#e91e63"></div><div class="rem-info"><div class="rem-title">🝄 Diagnóstico de gestação – Matriz #018</div><div class="rem-sub">30 dias após cobertura · Solicite visita do MV</div></div><span class="bdg urg">⚠︝ Pendente</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="ch"><h3>🟡 Esta semana / Próximos 30 dias</h3></div>
+          <div class="cbp">
+            <div class="rem-list">
+              <div class="rem-item"><div class="rem-color" style="background:#ff9800"></div><div class="rem-info"><div class="rem-title">🝴 Retorno MV – Equino #007 Trovão</div><div class="rem-sub">Agendado para 25/Out/2026</div></div><span class="bdg al">5 dias</span></div>
+              <div class="rem-item"><div class="rem-color" style="background:#ff9800"></div><div class="rem-info"><div class="rem-title">🝄 Carrapaticida – Lote A</div><div class="rem-sub">Previsto para 20/Nov/2026</div></div><span class="bdg al">31 dias</span></div>
+              <div class="rem-item"><div class="rem-color" style="background:#2196f3"></div><div class="rem-info"><div class="rem-title">🝄 DG – 5 matrizes Lote A</div><div class="rem-sub">Previsto entre 28/Out e 05/Nov/2026</div></div><span class="bdg inf">8–15 dias</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="ch"><h3>🟢 Concluídos Recentes</h3></div>
+          <div class="cbp">
+            <div class="rem-list">
+              <div class="rem-item"><div class="rem-color" style="background:#4caf50"></div><div class="rem-info"><div class="rem-title">🝑 Vermifugação – Lote B (30 ovinos)</div><div class="rem-sub">Realizada em 15/Out/2026</div></div><span class="bdg ok">✅ Feito</span></div>
+              <div class="rem-item"><div class="rem-color" style="background:#4caf50"></div><div class="rem-info"><div class="rem-title">🝷 Vacinação Circovac – Granja</div><div class="rem-sub">Realizada em 08/Out/2026</div></div><span class="bdg ok">✅ Feito</span></div>
+              <div class="rem-item"><div class="rem-color" style="background:#4caf50"></div><div class="rem-info"><div class="rem-title">🝄 Mineralização – Todos os lotes</div><div class="rem-sub">Reposição realizada em 10/Out/2026</div></div><span class="bdg ok">✅ Feito</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ╝╝ CONFIG ╝╝ -->
+      <div class="panel" id="p-config">
+        <div class="card">
+          <div class="ch"><h3>⚙︝ Dados da Propriedade e Conta</h3></div>
+          <div class="cbp">
+            <div class="fg">
+              <div class="fgr"><label>Nome do produtor</label><input type="text" value="João Silva"></div>
+              <div class="fgr"><label>CPF / CNPJ</label><input type="text" value="123.456.789-00"></div>
+              <div class="fgr"><label>Nome da propriedade</label><input type="text" value="Fazenda Boa Vista"></div>
+              <div class="fgr"><label>Município / Estado</label><input type="text" value="Ribeirão Preto, SP"></div>
+              <div class="fgr"><label>Ýrea (hectares)</label><input type="number" value="320"></div>
+              <div class="fgr"><label>Telefone / WhatsApp</label><input type="tel" value="(16) 99999-1234"></div>
+              <div class="fgr"><label>E-mail</label><input type="email" value="joao.silva@fazendaboavista.com"></div>
+              <div class="fgr"><label>NIRF / Inscrição Estadual</label><input type="text" placeholder="Registro da propriedade"></div>
+              <div class="fgr full"><label>Observações da propriedade</label><textarea rows="2" placeholder="Sistema de criação, certificações, particularidades..."></textarea></div>
+            </div>
+            <div class="fax"><button class="bsv" onclick="toast('Configurações salvas!')">💾 Salvar Alterações</button></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </main>
+</div>
+
+<!-- MODAIS -->
+<div class="movo" id="m-lote" onclick="fecharModal('m-lote',event)">
+  <div class="modb"><button class="modb-x" onclick="fecharModal('m-lote')">✕</button><h3>🝂 Novo Lote / Grupo</h3>
+    <div class="fg">
+      <div class="fgr full"><label>Nome do lote</label><input type="text" placeholder="Ex: Lote D – Bovinos de cria"></div>
+      <div class="fgr"><label>Espécie</label><select><option>Bovino</option><option>Equino</option><option>Ovino</option><option>Caprino</option><option>Suíno</option></select></div>
+      <div class="fgr"><label>Quantidade de animais</label><input type="number" placeholder="Ex: 30"></div>
+      <div class="fgr"><label>Localização (pasto/área)</label><input type="text" placeholder="Ex: Pastagem 4"></div>
+      <div class="fgr"><label>Finalidade</label><select><option>Corte</option><option>Leite</option><option>Reprodução</option><option>Engorda</option><option>Misto</option></select></div>
+      <div class="fgr"><label>Data de formação</label><input type="date" value="2026-10-20"></div>
+    </div>
+    <div class="fax"><button class="bsv" onclick="fecharModal('m-lote');toast('Lote cadastrado!')">💾 Criar Lote</button><button class="bcn" onclick="fecharModal('m-lote')">Cancelar</button></div>
+  </div>
+</div>
+
+<div class="movo" id="m-hist" onclick="fecharModal('m-hist',event)">
+  <div class="modb"><button class="modb-x" onclick="fecharModal('m-hist')">✕</button><h3>📋 Novo Registro Sanitário</h3>
+    <div class="fg">
+      <div class="fgr"><label>Animal / Lote</label><input type="text" placeholder="Ex: Bovino #042 ou Lote A"></div>
+      <div class="fgr"><label>Tipo de registro</label><select><option>Vacinação</option><option>Tratamento</option><option>Vermifugação</option><option>Cobertura</option><option>Parto</option><option>Cirurgia</option><option>Exame</option><option>Outros</option></select></div>
+      <div class="fgr"><label>Data</label><input type="date" value="2026-10-20"></div>
+      <div class="fgr"><label>Responsável</label><input type="text" placeholder="Ex: Dra. Ana ou Produtor"></div>
+      <div class="fgr full"><label>Produto / Procedimento</label><input type="text" placeholder="Ex: Ivermectina 1% · 0,2 mL/kg SC"></div>
+      <div class="fgr full"><label>Observações</label><textarea rows="2" placeholder="Resultado, intercorrências, próxima data..."></textarea></div>
+    </div>
+    <div class="fax"><button class="bsv" onclick="fecharModal('m-hist');toast('Registro salvo!')">💾 Salvar Registro</button><button class="bcn" onclick="fecharModal('m-hist')">Cancelar</button></div>
+  </div>
+</div>
+
+<div class="movo" id="m-repro" onclick="fecharModal('m-repro',event)">
+  <div class="modb"><button class="modb-x" onclick="fecharModal('m-repro')">✕</button><h3>🝄 Registro Reprodutivo</h3>
+    <div class="fg">
+      <div class="fgr"><label>Animal</label><input type="text" placeholder="Ex: Matriz #018 – Lua"></div>
+      <div class="fgr"><label>Evento reprodutivo</label><select><option>Cobertura natural</option><option>Inseminação artificial (IA)</option><option>IATF</option><option>Diagnóstico de gestação (DG)</option><option>Parto</option><option>Aborto</option><option>Desmame</option></select></div>
+      <div class="fgr"><label>Data</label><input type="date" value="2026-10-20"></div>
+      <div class="fgr"><label>Responsável</label><input type="text" placeholder="MV ou produtor"></div>
+      <div class="fgr"><label>Resultado</label><select><option>Positivo/Gestante</option><option>Negativo/Vazia</option><option>Pendente</option><option>Parto normal</option><option>Parto distócico</option></select></div>
+      <div class="fgr"><label>DG previsto</label><input type="date"></div>
+      <div class="fgr full"><label>Observações</label><textarea rows="2" placeholder="Detalhes do evento reprodutivo..."></textarea></div>
+    </div>
+    <div class="fax"><button class="bsv" onclick="fecharModal('m-repro');toast('Registro reprodutivo salvo!')">💾 Salvar</button><button class="bcn" onclick="fecharModal('m-repro')">Cancelar</button></div>
+  </div>
+</div>
+
+<div class="movo" id="m-vac" onclick="fecharModal('m-vac',event)">
+  <div class="modb"><button class="modb-x" onclick="fecharModal('m-vac')">✕</button><h3>💉 Registrar Vacina / Tratamento</h3>
+    <div class="fg">
+      <div class="fgr"><label>Animal / Lote</label><input type="text" placeholder="Ex: Lote A · 48 bovinos"></div>
+      <div class="fgr"><label>Tipo</label><select><option>Vacinação</option><option>Tratamento</option><option>Vermifugação</option><option>Carrapaticida</option><option>Vitamina</option></select></div>
+      <div class="fgr"><label>Produto / Vacina</label><input type="text" placeholder="Ex: Aftovax, Ivermectina..."></div>
+      <div class="fgr"><label>Dose</label><input type="text" placeholder="Ex: 2 mL/animal"></div>
+      <div class="fgr"><label>Via</label><select><option>Subcutânea (SC)</option><option>Intramuscular (IM)</option><option>Intravenosa (IV)</option><option>Oral (VO)</option><option>Banho/Tópica</option></select></div>
+      <div class="fgr"><label>Data da aplicação</label><input type="date" value="2026-10-20"></div>
+      <div class="fgr"><label>Próxima dose</label><input type="date"></div>
+      <div class="fgr"><label>Responsável</label><input type="text" placeholder="MV responsável ou produtor"></div>
+    </div>
+    <div class="fax"><button class="bsv" onclick="fecharModal('m-vac');toast('Registro de vacina salvo!')">💾 Salvar</button><button class="bcn" onclick="fecharModal('m-vac')">Cancelar</button></div>
+  </div>
+</div>
+
+<div class="movo" id="m-man" onclick="fecharModal('m-man',event)">
+  <div class="modb"><button class="modb-x" onclick="fecharModal('m-man')">✕</button><h3>🔧 Registrar Manejo</h3>
+    <div class="fg">
+      <div class="fgr full"><label>Descrição do manejo</label><input type="text" placeholder="Ex: Pesagem geral – Lote A"></div>
+      <div class="fgr"><label>Categoria</label><select><option>Sanitário</option><option>Reprodutivo</option><option>Nutricional</option><option>Instalações</option><option>Outros</option></select></div>
+      <div class="fgr"><label>Animal / Lote</label><input type="text" placeholder="Ex: Lote A ou todos"></div>
+      <div class="fgr"><label>Data de realização</label><input type="date" value="2026-10-20"></div>
+      <div class="fgr"><label>Próximo manejo</label><input type="date"></div>
+      <div class="fgr"><label>Responsável</label><input type="text" placeholder="Quem realizou ou vai realizar"></div>
+      <div class="fgr full"><label>Observações</label><textarea rows="2" placeholder="Resultado, intercorrências, observações..."></textarea></div>
+    </div>
+    <div class="fax"><button class="bsv" onclick="fecharModal('m-man');toast('Manejo registrado!')">💾 Registrar</button><button class="bcn" onclick="fecharModal('m-man')">Cancelar</button></div>
+  </div>
+</div>
+
+<div class="movo" id="m-lem" onclick="fecharModal('m-lem',event)">
+  <div class="modb"><button class="modb-x" onclick="fecharModal('m-lem')">✕</button><h3>🔔 Novo Lembrete</h3>
+    <div class="fg">
+      <div class="fgr full"><label>Descrição do lembrete</label><input type="text" placeholder="Ex: Vacinação aftosa – Lote A"></div>
+      <div class="fgr"><label>Categoria</label><select><option>Sanitário</option><option>Reprodutivo</option><option>Nutricional</option><option>Visita MV</option><option>Outros</option></select></div>
+      <div class="fgr"><label>Data do evento</label><input type="date"></div>
+      <div class="fgr"><label>Prioridade</label><select><option>Alta – Urgente</option><option>Média</option><option>Baixa</option></select></div>
+      <div class="fgr full"><label>Observações</label><textarea rows="2" placeholder="Detalhes adicionais..."></textarea></div>
+    </div>
+    <div class="fax"><button class="bsv" onclick="fecharModal('m-lem');toast('Lembrete criado!')">💾 Criar Lembrete</button><button class="bcn" onclick="fecharModal('m-lem')">Cancelar</button></div>
+  </div>
+</div>
+
+<div class="movo" id="m-buscamv" onclick="fecharModal('m-buscamv',event)">
+  <div class="modb"><button class="modb-x" onclick="fecharModal('m-buscamv')">✕</button><h3>🔝 Buscar Médico Veterinário</h3>
+    <div class="fg">
+      <div class="fgr"><label>Cidade / Estado</label><input type="text" placeholder="Ex: Ribeirão Preto, SP" id="busca-cidade"></div>
+      <div class="fgr"><label>Especialidade</label><select><option>Qualquer</option><option>Bovinos</option><option>Equinos</option><option>Ovinos/Caprinos</option><option>Suínos</option><option>Reprodução</option><option>Cirurgia</option></select></div>
+    </div>
+    <button class="bsv" style="margin-top:14px;width:100%" onclick="document.getElementById('res-mv').style.display='block'">🔝 Buscar</button>
+    <div id="res-mv" style="display:none;margin-top:18px">
+      <div style="font-size:.82rem;color:var(--txs);margin-bottom:12px">3 veterinários encontrados</div>
+      <div class="vet-list">
+        <div class="vet-card"><div class="vet-av">AM</div><div class="vet-info"><strong>Dr. André Monteiro</strong><span>Bovinos · Equinos · CRMV-SP 34521</span></div><span class="vet-km">📝 12 km</span></div>
+        <div class="vet-card"><div class="vet-av">CL</div><div class="vet-info"><strong>Dra. Carla Lemos</strong><span>Ruminantes · Reprodução · CRMV-SP 41200</span></div><span class="vet-km">📝 28 km</span></div>
+        <div class="vet-card"><div class="vet-av">FO</div><div class="vet-info"><strong>Dr. Fernando Oliveira</strong><span>Bovinos · Cirurgia · CRMV-SP 52108</span></div><span class="vet-km">📝 45 km</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast-msg"></div>
+
+<script>
+  const titles={dashboard:['Dashboard','Bem-vindo, João! Você tem 2 alertas pendentes.'],animais:['Meus Animais','Gerencie todos os animais da propriedade.'],rebanhos:['Rebanhos e Lotes','Organização e identificação dos grupos.'],historico:['Histórico Sanitário e Reprodutivo','Timeline completa de eventos.'],vacinas:['Vacinas e Tratamentos','Registro de aplicações e protocolos.'],manejos:['Controle de Manejos','Atividades sanitárias, reprodutivas e nutricionais.'],visita:['Solicitar Visita do MV','Solicite e acompanhe visitas técnicas.'],lembretes:['Lembretes e Alertas','Atividades pendentes e programadas.'],config:['Configurações','Dados da propriedade e conta.']};
+
+  function show(id,el){
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+    document.getElementById('p-'+id).classList.add('active');
+    if(el)el.classList.add('active');
+    else document.querySelectorAll('.ni').forEach(n=>{if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+id+"'"))n.classList.add('active');});
+    if(titles[id]){document.getElementById('pagetitle').textContent=titles[id][0];document.getElementById('pagesub').textContent=titles[id][1];}
+  }
+
+  function abrirModal(id){document.getElementById(id).classList.add('on');document.body.style.overflow='hidden';}
+  function fecharModal(id,e){if(!e||e.target.id===id){document.getElementById(id).classList.remove('on');document.body.style.overflow='';}}
+
+  function toast(msg){const t=document.getElementById('toast-msg');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),3000);}
+</script>
+</body>
+</html>
+
+
+

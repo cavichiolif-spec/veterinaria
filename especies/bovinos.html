@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bovinos &ndash; VetPr&aacute;tica</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --v1:#2d5a1b;--v2:#4a7a2d;--v3:#6b9e40;--vs:#e8f2dc;
+  --bege:#faf3e7;--bege2:#f0e8d5;--bege3:#c8b89a;
+  --terra:#8b6914;--terra2:#a0845c;
+  --tx:#2c2c2c;--txs:#5a5a5a;--wh:#fff;
+  --sh:0 2px 10px rgba(0,0,0,.09);--shm:0 4px 22px rgba(0,0,0,.13);
+  --r:10px;--tr:.25s ease;--serif:'Georgia','Times New Roman',serif
+}
+html{scroll-behavior:smooth}
+body{font-family:'Segoe UI',system-ui,sans-serif;color:var(--tx);line-height:1.6;background:var(--wh)}
+a{text-decoration:none;color:inherit}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:900;background:rgba(255,255,255,.97);backdrop-filter:blur(8px);border-bottom:2px solid var(--bege2);height:70px;padding:0 5%;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:11px}
+.logo img{width:44px;height:44px;object-fit:contain;border-radius:6px}
+.logo-nm{font-family:var(--serif);font-size:1.25rem;font-weight:700;color:var(--v1);line-height:1.1}
+.logo-sub{display:block;font-size:.6rem;font-weight:400;color:var(--terra2);letter-spacing:.5px;font-style:italic}
+.nl{list-style:none;display:flex;align-items:center;gap:20px}
+.nl a{font-size:.88rem;font-weight:500;color:var(--txs);transition:color var(--tr)}
+.nl a:hover{color:var(--v1)}
+.btn-back{border:2px solid var(--v1)!important;color:var(--v1)!important;padding:6px 20px;border-radius:50px!important;transition:all var(--tr)!important}
+.btn-back:hover{background:var(--v1)!important;color:var(--wh)!important}
+
+.hero{min-height:56vh;margin-top:70px;padding:60px 5%;display:flex;align-items:center;position:relative;overflow:hidden;color:var(--wh);background:linear-gradient(135deg,rgba(45,90,27,.86),rgba(74,122,45,.78)),center/cover no-repeat}
+.hero-in{max-width:1100px;margin:0 auto;width:100%}
+.hero .kicker{display:inline-block;font-size:.76rem;font-weight:700;text-transform:uppercase;letter-spacing:1.6px;background:rgba(255,255,255,.18);padding:6px 16px;border-radius:50px;margin-bottom:18px}
+.hero h1{font-family:var(--serif);font-style:italic;font-size:clamp(2rem,5vw,3.2rem);font-weight:700;margin-bottom:14px}
+.hero p{max-width:560px;font-size:1.08rem;opacity:.94}
+.crumb{max-width:1100px;margin:22px auto 0;padding:0 5%;font-size:.84rem;color:var(--txs)}
+.crumb a{color:var(--v1);font-weight:600}
+
+section{padding:64px 5%}
+.wrap{max-width:1100px;margin:0 auto}
+.tag{display:inline-block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;padding:5px 14px;border-radius:50px;margin-bottom:12px;background:var(--vs);color:var(--v1)}
+.stitle{font-family:var(--serif);font-size:clamp(1.5rem,3vw,2.1rem);font-weight:700;font-style:italic;color:var(--v1);margin-bottom:12px}
+.lead{color:var(--txs);font-size:1.03rem;max-width:720px;margin-bottom:12px}
+
+.split{display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:center}
+.split img{width:100%;border-radius:16px;box-shadow:var(--shm);object-fit:cover;max-height:460px}
+@media(max-width:860px){.split{grid-template-columns:1fr}}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:22px;margin-top:34px}
+.c{background:var(--wh);border-radius:var(--r);padding:26px 22px;box-shadow:var(--sh);border-top:3px solid var(--v2)}
+.c .ic{font-size:1.9rem;margin-bottom:10px}
+.c h3{font-size:1rem;font-weight:700;color:var(--v1);margin-bottom:6px}
+.c p{font-size:.88rem;color:var(--txs)}
+
+.bege{background:var(--bege)}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:18px;margin-top:30px}
+.fact{background:var(--wh);border-radius:var(--r);padding:22px;text-align:center;box-shadow:var(--sh);border:1px solid var(--bege2)}
+.fact .n{font-family:var(--serif);font-size:1.9rem;font-weight:700;color:var(--v1)}
+.fact .l{font-size:.82rem;color:var(--txs);margin-top:4px}
+
+ul.chk{list-style:none;display:flex;flex-direction:column;gap:11px;margin-top:10px}
+ul.chk li{display:flex;gap:11px;font-size:.95rem;color:var(--txs)}
+ul.chk li::before{content:'\2713';color:var(--v2);font-weight:700}
+
+.cta{background:linear-gradient(135deg,var(--v1),var(--v2));color:var(--wh);text-align:center}
+.cta h2{font-family:var(--serif);font-style:italic;font-size:clamp(1.5rem,3vw,2.1rem);margin-bottom:12px}
+.cta p{opacity:.92;margin-bottom:26px}
+.ctabtn{display:inline-block;background:var(--wh);color:var(--v1);padding:13px 30px;border-radius:50px;font-weight:700;font-size:.95rem;box-shadow:0 4px 12px rgba(0,0,0,.2);transition:transform var(--tr)}
+.ctabtn:hover{transform:translateY(-2px)}
+
+footer{background:#1a2e0d;color:#888;padding:34px 5%;text-align:center;font-size:.85rem}
+footer a{color:#a5d6a7}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="../index.html" class="logo">
+    <img src="../logo.PNG" alt="VetPr&aacute;tica">
+    <div>
+      <span class="logo-nm">VetPr&aacute;tica</span>
+      <small class="logo-sub">Trabalho que gera valor</small>
+    </div>
+  </a>
+  <ul class="nl">
+    <li><a href="../index.html#portais">Esp&eacute;cies</a></li>
+    <li><a href="../index.html#planos">Planos</a></li>
+    <li><a href="../index.html" class="btn-back">&larr; Voltar ao in&iacute;cio</a></li>
+  </ul>
+</nav>
+
+<section class="hero" style="background-image:linear-gradient(135deg,rgba(45,90,27,.86),rgba(74,122,45,.78)),url('../BOVINOS.PNG.PNG')">
+  <div class="hero-in">
+    <span class="kicker">Esp&eacute;cie &middot; Grandes animais</span>
+    <h1>Bovinos</h1>
+    <p>Gest&atilde;o completa de rebanhos de corte e leite &mdash; da identifica&ccedil;&atilde;o individual ao controle sanit&aacute;rio, reprodutivo e nutricional.</p>
+  </div>
+</section>
+<div class="crumb"><a href="../index.html">In&iacute;cio</a> &rsaquo; <a href="../index.html#portais">Esp&eacute;cies</a> &rsaquo; Bovinos</div>
+
+<section>
+  <div class="wrap split">
+    <div>
+      <span class="tag">Sobre a esp&eacute;cie</span>
+      <h2 class="stitle">Corte e leite com rastreabilidade total</h2>
+      <p class="lead">Os bovinos s&atilde;o a base da pecu&aacute;ria brasileira. No VetPr&aacute;tica, cada animal tem ficha individual com identifica&ccedil;&atilde;o, hist&oacute;rico sanit&aacute;rio e produtivo, permitindo decis&otilde;es r&aacute;pidas no campo e no consult&oacute;rio.</p>
+      <ul class="chk">
+        <li>Controle de ciclo de corte e produ&ccedil;&atilde;o leiteira</li>
+        <li>Calend&aacute;rio de vacina&ccedil;&atilde;o (febre aftosa, brucelose, clostridioses)</li>
+        <li>Gest&atilde;o reprodutiva: cio, cobertura, prenhez e parto</li>
+        <li>Pesagem e ganho m&eacute;dio di&aacute;rio (GMD)</li>
+      </ul>
+    </div>
+    <img src="../BOVINOS.PNG.PNG" alt="Bovinos no pasto">
+  </div>
+</section>
+
+<section class="bege">
+  <div class="wrap">
+    <span class="tag">Manejo no VetPr&aacute;tica</span>
+    <h2 class="stitle">Recursos para o rebanho bovino</h2>
+    <div class="cards">
+      <div class="c"><div class="ic">&#128220;</div><h3>Ficha individual</h3><p>Nome, numera&ccedil;&atilde;o, sexo, ra&ccedil;a e hist&oacute;rico completo de cada cabe&ccedil;a.</p></div>
+      <div class="c"><div class="ic">&#128137;</div><h3>Sanit&aacute;rio</h3><p>Vacinas, vermifuga&ccedil;&otilde;es e tratamentos com lembretes autom&aacute;ticos.</p></div>
+      <div class="c"><div class="ic">&#128202;</div><h3>Reprodu&ccedil;&atilde;o</h3><p>Controle de cio, IATF, prenhez e proje&ccedil;&atilde;o de nascimentos.</p></div>
+      <div class="c"><div class="ic">&#9878;</div><h3>Calculadora de doses</h3><p>Doses precisas por peso, com convers&atilde;o autom&aacute;tica de unidades.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <span class="tag">N&uacute;meros da esp&eacute;cie</span>
+    <h2 class="stitle">Por que o controle importa</h2>
+    <div class="facts">
+      <div class="fact"><div class="n">+200M</div><div class="l">Cabe&ccedil;as de gado no Brasil</div></div>
+      <div class="fact"><div class="n">2</div><div class="l">Aptid&otilde;es: corte e leite</div></div>
+      <div class="fact"><div class="n">100%</div><div class="l">Rastreabilidade por animal</div></div>
+      <div class="fact"><div class="n">24/7</div><div class="l">Acesso aos dados do rebanho</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="wrap">
+    <h2>Gerencie seu rebanho bovino com o VetPr&aacute;tica</h2>
+    <p>Cadastre-se gratuitamente e comece a registrar seus animais hoje mesmo.</p>
+    <a href="../index.html#planos" class="ctabtn">Come&ccedil;ar agora &rarr;</a>
+  </div>
+</section>
+
+<footer>
+  &copy; 2026 VetPr&aacute;tica. Todos os direitos reservados. &middot; <a href="../index.html">Voltar ao in&iacute;cio</a>
+</footer>
+
+</body>
+</html>
